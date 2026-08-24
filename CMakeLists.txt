@@ -9,6 +9,7 @@ set(OGRE_SDK "/Users/jewagenaar/SDK/ogre/sdk")
 list(APPEND CMAKE_PREFIX_PATH "${OGRE_SDK}")
 find_package(OGRE REQUIRED COMPONENTS Bites RTShaderSystem)
 find_package(SDL2 REQUIRED)
+find_package(nlohmann_json 3.12.0 REQUIRED)
 
 file(GLOB_RECURSE SOURCE_FILES 
   "src/*.cpp" 
@@ -27,6 +28,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   ${OGRE_LIBRARIES}
   ${SDL2_LIBRARIES}
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 if(APPLE)
   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

@@ -1,8 +1,14 @@
 #include "App.h"
 #include "Core/ResourceLoader.h"
+#include <OgreApplicationContextBase.h>
 #include <OgreFrameListener.h>
+#include <OgreImGuiInputListener.h>
+#include <OgreImGuiOverlay.h>
 #include <OgreTrays.h>
+#include <imgui.h>
+
 #include <cassert>
+#include <memory>
 
 void App::setup() {
   OgreBites::ApplicationContext::setup();
@@ -22,12 +28,23 @@ void App::setup() {
   m_TrayManager =
       new OgreBites::TrayManager("UIDebug", getRenderWindow(), this);
   m_TrayManager->showFrameStats(OgreBites::TL_BOTTOMRIGHT);
+  m_TrayManager->hideCursor();
 
   m_ResourceLoader = new ResourceLoader();
   m_ResourceLoader->LoadConfig();
 
   m_World = new World(m_SceneManager, getRenderWindow());
   m_World->LoadLevel();
+
+  // TODO: move these to members
+
+  Ogre::ImGuiOverlay *imguiOverlay = new Ogre::ImGuiOverlay();
+  imguiOverlay->setZOrder(300);
+  imguiOverlay->show();
+  Ogre::OverlayManager::getSingleton().addOverlay(imguiOverlay);
+
+  auto imguiInputListener = new OgreBites::ImGuiInputListener();
+  addInputListener(imguiInputListener);
 }
 
 void App::shutdown() {
@@ -51,6 +68,13 @@ bool App::frameRenderingQueued(const Ogre::FrameEvent &evt) {
 
 bool App::frameStarted(const Ogre::FrameEvent &evt) {
   OgreBites::ApplicationContext::frameStarted(evt);
+
+  assert(m_World && "Can't tick a frame without a world active.");
+
+  Ogre::ImGuiOverlay::NewFrame();
+
+  const auto deltaTime = evt.timeSinceLastEvent;
+  m_World->UITick(deltaTime);
 
   m_TrayManager->frameRendered(evt);
 

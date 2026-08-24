@@ -16,6 +16,7 @@ World::World(Ogre::SceneManager *SceneManager,
 
 World::~World() {
   GEngine::Unregister<World>(this);
+  m_GUIs.clear();
   m_SceneManager = nullptr;
 }
 
@@ -30,6 +31,12 @@ void World::FrameTick(const float &DeltaTime) {
   }
 }
 
+void World::UITick(const float &DeltaTime) {
+  for (auto gui : m_GUIs) {
+    gui->Tick(DeltaTime);
+  }
+}
+
 Ogre::Camera *World::CreateCamera(const std::string &Id) {
   auto cam = m_SceneManager->createCamera(Id);
   auto vp = m_RenderWindow->addViewport(cam);
@@ -40,3 +47,5 @@ Ogre::Camera *World::CreateCamera(const std::string &Id) {
 
   return cam;
 }
+
+void World::AddGUI(GUI *GUI) { m_GUIs.push_back(GUI); }

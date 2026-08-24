@@ -1,11 +1,13 @@
 #pragma once
 
 #include <concepts>
+#include <vector>
 
 #include "Ogre.h"
 #include <OgreSceneManager.h>
 
 #include "Entity.h"
+#include "GUI.h"
 #include "Level.h"
 
 class World {
@@ -15,6 +17,7 @@ public:
 
   void LoadLevel();
   void FrameTick(const float &DeltaTime);
+  void UITick(const float &DeltaTime);
 
   template <std::derived_from<Entity> T> T *CreateEntity() {
     auto node = m_SceneManager->getRootSceneNode()->createChildSceneNode();
@@ -23,8 +26,9 @@ public:
   }
 
   Ogre::Camera *CreateCamera(const std::string &Id);
-
   Ogre::SceneManager *GetSceneManager() { return m_SceneManager; }
+
+  void AddGUI(GUI *GUI);
 
 private:
   Ogre::SceneManager *m_SceneManager;
@@ -33,4 +37,6 @@ private:
   Level *m_ActiveLevel;
 
   double m_WorldTime;
+
+  std::vector<GUI *> m_GUIs;
 };
