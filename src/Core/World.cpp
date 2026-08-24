@@ -32,6 +32,11 @@ void World::FrameTick(const float &DeltaTime) {
 
 Ogre::Camera *World::CreateCamera(const std::string &Id) {
   auto cam = m_SceneManager->createCamera(Id);
-  m_RenderWindow->addViewport(cam);
+  auto vp = m_RenderWindow->addViewport(cam);
+
+  Ogre::Real aspectRatio =
+      Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight());
+  cam->setAspectRatio(aspectRatio);
+
   return cam;
 }

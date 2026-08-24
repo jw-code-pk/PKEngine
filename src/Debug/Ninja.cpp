@@ -18,7 +18,7 @@ bool Ninja::Init() {
   Ogre::Light *light = m_SceneManager->createLight("MainLight");
   Ogre::SceneNode *lightNode = GetRoot()->createChildSceneNode();
   lightNode->attachObject(light);
-  lightNode->setPosition(20, 80, 50);
+  lightNode->setPosition(120, 180, 150);
 
   Ogre::SceneNode *camNode = GetRoot()->createChildSceneNode();
   Ogre::Camera *cam = world->CreateCamera("MainCam");
@@ -26,10 +26,16 @@ bool Ninja::Init() {
   camNode->attachObject(cam);
   camNode->setPosition(0, 0, 1500);
 
-  Ogre::Entity *ent = m_SceneManager->createEntity("Ninja", "ninja.mesh");
+  Ogre::Entity *ninjaMesh = m_SceneManager->createEntity("Ninja", "ninja.mesh");
   m_PawnNode = GetRoot()->createChildSceneNode();
-  m_PawnNode->attachObject(ent);
+  m_PawnNode->attachObject(ninjaMesh);
   m_PawnNode->setPosition(0, -100, 0);
+
+  Ogre::Entity *cubeMesh = m_SceneManager->createEntity("Cube", "Cube.mesh");
+  Ogre::SceneNode *cubeNode = GetRoot()->createChildSceneNode();
+  cubeNode->attachObject(cubeMesh);
+  cubeNode->setInheritScale(false);
+  cubeNode->setScale(50, 50, 50);
 
   GetRoot()->setPosition(0, 0, 0);
 

@@ -1,5 +1,7 @@
 #include "App.h"
-#include <OgreSceneManager.h>
+#include "Core/ResourceLoader.h"
+#include <OgreFrameListener.h>
+#include <OgreTrays.h>
 #include <cassert>
 
 void App::setup() {
@@ -15,15 +17,43 @@ void App::setup() {
 
   root->addFrameListener(this);
 
+  m_SceneManager->addRenderQueueListener(mOverlaySystem);
+
+  m_TrayManager =
+      new OgreBites::TrayManager("UIDebug", getRenderWindow(), this);
+  m_TrayManager->showFrameStats(OgreBites::TL_BOTTOMRIGHT);
+
+  m_ResourceLoader = new ResourceLoader();
+  m_ResourceLoader->LoadConfig();
+
   m_World = new World(m_SceneManager, getRenderWindow());
   m_World->LoadLevel();
 }
 
+void App::shutdown() {
+  m_SceneManager->clearScene();
+
+  delete m_World;
+  delete m_ResourceLoader;
+
+  OgreBites::ApplicationContext::shutdown();
+}
+
 bool App::frameRenderingQueued(const Ogre::FrameEvent &evt) {
+  OgreBites::ApplicationContext::frameRenderingQueued(evt);
+
   assert(m_World && "Can't tick a frame without a world active.");
 
   const auto deltaTime = evt.timeSinceLastEvent;
   m_World->FrameTick(deltaTime);
+  return true;
+}
+
+bool App::frameStarted(const Ogre::FrameEvent &evt) {
+  OgreBites::ApplicationContext::frameStarted(evt);
+
+  m_TrayManager->frameRendered(evt);
+
   return true;
 }
 

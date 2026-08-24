@@ -10,6 +10,9 @@ public:
 
   virtual void Tick(const float &DeltaTime) override;
 
+protected:
+  void DisplayTestImage();
+
 private:
   std::vector<Entity *> m_TickList;
 };
