@@ -6,6 +6,8 @@
 #include "Debug/DebugGUI.h"
 #include "Ninja.h"
 
+#include <OgreMath.h>
+#include <OgreMatrix3.h>
 #include <OgreOverlay.h>
 #include <OgreOverlayContainer.h>
 #include <OgreOverlayElement.h>
@@ -15,7 +17,6 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-#include <algorithm>
 #include <cassert>
 
 using json = nlohmann::json;
@@ -77,8 +78,21 @@ void DebugLevel::SelectPrevEntity() {
     m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
   }
 
-  m_CurrentIndex = std::max(0, m_CurrentIndex - 1);
+  m_CurrentIndex = m_CurrentIndex - 1;
+
+  if (m_CurrentIndex < 0) {
+    m_CurrentIndex = num - 1;
+  }
+
   m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
+}
+
+Ogre::Vector3 DebugLevel::GetEntityPosition() {
+  if (m_CurrentIndex < 0) {
+    return Ogre::Vector3::ZERO;
+  }
+
+  return m_Entities[m_CurrentIndex]->GetRoot()->getPosition();
 }
 
 void DebugLevel::SetEntityPosition(const Ogre::Vector3 &Position) {
@@ -87,6 +101,39 @@ void DebugLevel::SetEntityPosition(const Ogre::Vector3 &Position) {
   }
 
   m_Entities[m_CurrentIndex]->GetRoot()->setPosition(Position);
+}
+
+Ogre::Vector3 DebugLevel::GetEntityRotation() {
+  if (m_CurrentIndex < 0) {
+    return Ogre::Vector3::ZERO;
+  }
+
+  auto entity = m_Entities[m_CurrentIndex];
+  auto rot = entity->GetRoot()->getOrientation();
+
+  Ogre::Radian yaw, pitch, roll;
+  Ogre::Matrix3 rotMat;
+
+  rot.ToRotationMatrix(rotMat);
+  rotMat.ToEulerAnglesYXZ(yaw, pitch, roll);
+
+  return Ogre::Vector3(pitch.valueDegrees(), yaw.valueDegrees(),
+                       roll.valueDegrees());
+}
+
+void DebugLevel::SetEntityRotation(const Ogre::Vector3 &Rotation) {
+  if (m_CurrentIndex < 0) {
+    return;
+  }
+
+  Ogre::Matrix3 rotMat;
+  Ogre::Degree xRot(Rotation.x), yRot(Rotation.y), zRot(Rotation.z);
+  Ogre::Radian yaw(yRot.valueRadians()), pitch(xRot.valueRadians()),
+      roll(zRot.valueRadians());
+
+  rotMat.FromEulerAnglesYXZ(yaw, pitch, roll);
+
+  m_Entities[m_CurrentIndex]->GetRoot()->setOrientation(rotMat);
 }
 
 void DebugLevel::SaveLevel(const Ogre::String &Name) {

@@ -11,5 +11,4 @@ public:
 
 private:
   DebugLevel *m_Level;
-  Ogre::Vector3 m_Position;
 };

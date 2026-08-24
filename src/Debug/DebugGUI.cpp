@@ -3,10 +3,7 @@
 #include "imgui.h"
 #include <OgrePrerequisites.h>
 
-DebugGUI::DebugGUI(DebugLevel *Level) {
-  m_Level = Level;
-  m_Position = Ogre::Vector3::ZERO;
-}
+DebugGUI::DebugGUI(DebugLevel *Level) { m_Level = Level; }
 
 void DebugGUI::Tick(const float &DeltaTime) {
   ImGui::Begin("Debug");
@@ -22,8 +19,16 @@ void DebugGUI::Tick(const float &DeltaTime) {
     m_Level->SelectPrevEntity();
   }
 
-  if (ImGui::InputFloat3("Position", &m_Position.x)) {
-    m_Level->SetEntityPosition(m_Position);
+  auto pos = m_Level->GetEntityPosition();
+
+  if (ImGui::InputFloat3("Position", &pos.x)) {
+    m_Level->SetEntityPosition(pos);
+  }
+
+  auto rot = m_Level->GetEntityRotation();
+
+  if (ImGui::InputFloat3("Rotation", &rot.x)) {
+    m_Level->SetEntityRotation(rot);
   }
 
   if (ImGui::Button("Save")) {

@@ -13,7 +13,12 @@ public:
 
   void SelectNextEntity();
   void SelectPrevEntity();
+
+  Ogre::Vector3 GetEntityPosition();
   void SetEntityPosition(const Ogre::Vector3 &Position);
+
+  Ogre::Vector3 GetEntityRotation();
+  void SetEntityRotation(const Ogre::Vector3 &Rotation);
 
   void SaveLevel(const Ogre::String &Name);
 
