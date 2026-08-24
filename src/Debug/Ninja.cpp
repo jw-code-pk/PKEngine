@@ -31,12 +31,6 @@ bool Ninja::Init() {
   m_PawnNode->attachObject(ninjaMesh);
   m_PawnNode->setPosition(0, -100, 0);
 
-  Ogre::Entity *cubeMesh = m_SceneManager->createEntity("Cube", "Cube.mesh");
-  Ogre::SceneNode *cubeNode = GetRoot()->createChildSceneNode();
-  cubeNode->attachObject(cubeMesh);
-  cubeNode->setInheritScale(false);
-  cubeNode->setScale(50, 50, 50);
-
   GetRoot()->setPosition(0, 0, 0);
 
   return true;

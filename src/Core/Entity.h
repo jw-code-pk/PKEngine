@@ -8,7 +8,7 @@ public:
 
   virtual bool Init() { return true; }
 
-  virtual void Tick(const float &DeltaTime) = 0;
+  virtual void Tick(const float &DeltaTime) {}
 
   bool CanTick() { return m_CanTick; }
 

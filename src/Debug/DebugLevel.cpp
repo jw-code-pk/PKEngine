@@ -2,6 +2,7 @@
 #include "Core/GEngine.h"
 #include "Core/ResourceLoader.h"
 #include "Core/World.h"
+#include "Cube.h"
 #include "Ninja.h"
 
 #include <OgreOverlay.h>
@@ -23,6 +24,9 @@ void DebugLevel::Init() {
   if (ninja->CanTick()) {
     m_TickList.push_back(ninja);
   }
+
+  auto cube = world->CreateEntity<Cube>();
+  cube->Init();
 
   DisplayTestImage();
 }
