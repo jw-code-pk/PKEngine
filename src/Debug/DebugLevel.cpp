@@ -1,5 +1,6 @@
 #include "DebugLevel.h"
 #include "Core/Curves/Arc.h"
+#include "Core/Curves/Line.h"
 #include "Core/Curves/Spline.h"
 #include "Core/GEngine.h"
 #include "Core/ResourceLoader.h"
@@ -43,28 +44,12 @@ void DebugLevel::Init() {
   m_Camera->attachObject(cam);
   m_Camera->setPosition(0, 0, 1500);
 
-  // Create entities
-  auto ninja = world->CreateEntity<Ninja>();
-  ninja->Init();
-
-  if (ninja->CanTick()) {
-    m_TickList.push_back(ninja);
-  }
-  m_Entities.push_back(ninja);
-
-  auto spline = world->CreateEntity<Spline>();
-  spline->Init();
-  m_Entities.push_back(spline);
-
-  auto arc = world->CreateEntity<Arc>();
-  arc->Init();
-  arc->Setup(500, Ogre::Degree(90));
-  m_Entities.push_back(arc);
-
   m_GUI = new DebugGUI(this);
   world->AddGUI(m_GUI);
 
   m_CurrentIndex = -1;
+
+  LoadLevel("Test.json");
 
   DisplayTestImage();
 }
@@ -202,6 +187,8 @@ void DebugLevel::SaveLevel(const Ogre::String &Name) {
                          {"yaw", yaw.valueDegrees()},
                          {"roll", roll.valueDegrees()}};
 
+    entityData["meta"] = entity->GetMetadata();
+
     levelData["entities"].push_back(entityData);
   }
 
@@ -209,6 +196,68 @@ void DebugLevel::SaveLevel(const Ogre::String &Name) {
   if (file.is_open()) {
     file << levelData.dump(4);
   }
+}
+
+void DebugLevel::LoadLevel(const Ogre::String &Name) {
+  std::ifstream file(Name);
+  if (!file.is_open()) {
+    return;
+  }
+
+  json sceneJson;
+  file >> sceneJson;
+
+  for (const auto &item : sceneJson["entities"]) {
+    std::string type = item["type_id"];
+
+    auto entity = SpawnFromTypeId(type);
+
+    if (!entity) {
+      continue;
+    }
+
+    auto pos = item["pos"];
+    entity->GetRoot()->setPosition(pos["x"], pos["y"], pos["z"]);
+
+    auto rot = item["rot"];
+    Ogre::Matrix3 rotMat;
+    rotMat.FromEulerAnglesYXZ(Ogre::Degree(rot["yaw"]),
+                              Ogre::Degree(rot["pitch"]),
+                              Ogre::Degree(rot["roll"]));
+    entity->GetRoot()->setOrientation(rotMat);
+  }
+}
+
+Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
+  World *world = nullptr;
+  const auto bHasWorld = GEngine::TryGet(world);
+  assert(bHasWorld && "No world is registered.");
+
+  Entity *result = nullptr;
+
+  if (TypeId == "Ninja") {
+    result = world->CreateEntity<Ninja>();
+  } else if (TypeId == "Arc") {
+    result = world->CreateEntity<Arc>();
+  } else if (TypeId == "Spline") {
+    result = world->CreateEntity<Spline>();
+  } else if (TypeId == "Line") {
+    result = world->CreateEntity<Line>();
+  } else if (TypeId == "Cube") {
+    result = world->CreateEntity<Cube>();
+  }
+
+  if (result) {
+    result->Init();
+
+    m_Entities.push_back(result);
+
+    if (result->CanTick()) {
+      m_TickList.push_back(result);
+    }
+  }
+
+  return result;
 }
 
 void DebugLevel::DisplayTestImage() {

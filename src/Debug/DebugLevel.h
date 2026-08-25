@@ -25,8 +25,11 @@ public:
   void CameraToEntity();
 
   void SaveLevel(const Ogre::String &Name);
+  void LoadLevel(const Ogre::String &Name);
 
 protected:
+  Entity *SpawnFromTypeId(const Ogre::String &TypeId);
+
   void DisplayTestImage();
 
 private:

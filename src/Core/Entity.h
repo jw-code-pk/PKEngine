@@ -1,6 +1,7 @@
 #pragma once
 
 #include <OgreSceneNode.h>
+#include <nlohmann/json.hpp>
 
 class Entity {
 public:
@@ -11,6 +12,10 @@ public:
   virtual bool Init() { return true; }
 
   virtual void Tick(const float &DeltaTime) {}
+
+  virtual void SetMetadata(const nlohmann::json &Metadata) {}
+
+  virtual nlohmann::json GetMetadata() const { return {}; }
 
   bool CanTick() { return m_CanTick; }
 
