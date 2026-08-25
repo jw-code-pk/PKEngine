@@ -6,11 +6,18 @@ CurveFollower::CurveFollower(Ogre::SceneNode *Root) : Entity(Root) {
 }
 
 void CurveFollower::Tick(const float &DeltaTime) {
-  if (HasCurve()) {
-    m_Distance += m_Speed * DeltaTime;
-    auto updatedPos = m_Curve->Evaluate(m_Distance);
-    GetRoot()->setPosition(updatedPos);
+  if (!HasCurve()) {
+    return;
   }
+
+  m_Distance += m_Speed * DeltaTime;
+
+  if (IsCoyote()) {
+    return;
+  }
+
+  auto updatedPos = m_Curve->Evaluate(m_Distance);
+  GetRoot()->setPosition(updatedPos);
 }
 
 void CurveFollower::Follow(Curve *Curve, const float &Speed,
@@ -20,6 +27,8 @@ void CurveFollower::Follow(Curve *Curve, const float &Speed,
   m_Curve = Curve;
   m_Speed = Speed;
   m_Distance = StartDistance;
+
+  assert(!IsCoyote() && "Can't follow a curve with out of scope distance.");
 
   auto updatedPos = m_Curve->Evaluate(m_Distance);
   GetRoot()->setPosition(updatedPos);

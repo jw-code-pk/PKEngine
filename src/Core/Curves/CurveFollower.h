@@ -9,6 +9,9 @@ public:
 
   virtual void Tick(const float &DeltaTime) override;
 
+  inline bool IsCoyote() {
+    return m_Distance < 0 || m_Distance > m_Curve->GetLength();
+  }
   bool HasCurve() { return m_Curve != nullptr; }
   void Follow(Curve *Curve, const float &Speed, const float &StartDistance = 0);
 

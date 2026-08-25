@@ -2,6 +2,8 @@
 #include "Core/GEngine.h"
 #include "Core/World.h"
 
+#include <cassert>
+
 static int NextID = 0;
 
 Curve::Curve(Ogre::SceneNode *Root) : Entity(Root) { m_CurveID = NextID++; }
@@ -30,4 +32,30 @@ void Curve::ShowGizmos() {
   visual->end();
 
   GetRoot()->attachObject(visual);
+}
+
+Ogre::Vector3 Curve::FindClosestPoint(const Ogre::Vector3 &Position,
+                                      const float &Tolerance) {
+  assert(Tolerance >= 1.0f && "Tolerance can't be smaller than 1.0f.");
+
+  const auto length = GetLength();
+  const auto toleranceSq = Tolerance * Tolerance;
+  const auto numSamples = static_cast<int>(length * 0.5f / Tolerance);
+  const auto step = length / numSamples;
+
+  auto closestPoint = Evaluate(0);
+
+  for (int i = 1; i < numSamples; i++) {
+    const auto k = i * step;
+    const auto p = Evaluate(k);
+
+    const auto d1 = Position.squaredDistance(closestPoint);
+    const auto d2 = Position.squaredDistance(p);
+
+    if (d2 < d1) {
+      closestPoint = p;
+    }
+  }
+
+  return closestPoint;
 }

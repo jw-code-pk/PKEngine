@@ -13,6 +13,9 @@ public:
 
   int GetCurveId() const { return m_CurveID; }
 
+  Ogre::Vector3 FindClosestPoint(const Ogre::Vector3 &Position,
+                                 const float &Tolerance = 1.0f);
+
 private:
   int m_CurveID;
 };
