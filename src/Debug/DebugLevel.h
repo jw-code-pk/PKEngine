@@ -27,6 +27,9 @@ public:
   void SaveLevel(const Ogre::String &Name);
   void LoadLevel(const Ogre::String &Name);
 
+  void CreateEntity(const Ogre::String &TypeId,
+                    const Ogre::Vector3 &Position = Ogre::Vector3::ZERO);
+
 protected:
   Entity *SpawnFromTypeId(const Ogre::String &TypeId);
 

@@ -13,7 +13,7 @@ bool Ninja::Init() {
 
   auto m_SceneManager = world->GetSceneManager();
 
-  Ogre::Entity *ninjaMesh = m_SceneManager->createEntity("Ninja", "ninja.mesh");
+  Ogre::Entity *ninjaMesh = m_SceneManager->createEntity("ninja.mesh");
   m_PawnNode = GetRoot()->createChildSceneNode();
   m_PawnNode->attachObject(ninjaMesh);
 

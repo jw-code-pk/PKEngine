@@ -3,15 +3,25 @@
 #include "imgui.h"
 #include <OgrePrerequisites.h>
 
+const char *ENTITY_LIST[] = {"Ninja", "Arc", "Spline", "Line", "Cube"};
+
 DebugGUI::DebugGUI(DebugLevel *Level) { m_Level = Level; }
 
 void DebugGUI::Tick(const float &DeltaTime) {
   ImGui::Begin("Debug");
 
-  auto entityId = m_Level->GetEntityTypeId();
-  ImGui::Text("%s", entityId.c_str());
+  // Entity creation
+  ImGui::Combo("Entity Type", &m_EntityTypeSelectIndex, ENTITY_LIST,
+               IM_ARRAYSIZE(ENTITY_LIST));
+
+  if (ImGui::Button("Create")) {
+    m_Level->CreateEntity(ENTITY_LIST[m_EntityTypeSelectIndex]);
+  }
 
   // Entity focus
+
+  auto entityId = m_Level->GetEntityTypeId();
+  ImGui::Text("Selected [%s]", entityId.c_str());
 
   if (ImGui::Button("Prev")) {
     m_Level->SelectPrevEntity();

@@ -204,10 +204,10 @@ void DebugLevel::LoadLevel(const Ogre::String &Name) {
     return;
   }
 
-  json sceneJson;
-  file >> sceneJson;
+  json levelData;
+  file >> levelData;
 
-  for (const auto &item : sceneJson["entities"]) {
+  for (const auto &item : levelData["entities"]) {
     std::string type = item["type_id"];
 
     auto entity = SpawnFromTypeId(type);
@@ -225,6 +225,18 @@ void DebugLevel::LoadLevel(const Ogre::String &Name) {
                               Ogre::Degree(rot["pitch"]),
                               Ogre::Degree(rot["roll"]));
     entity->GetRoot()->setOrientation(rotMat);
+
+    auto meta = item["meta"];
+    entity->SetMetadata(meta);
+  }
+}
+
+void DebugLevel::CreateEntity(const Ogre::String &TypeId,
+                              const Ogre::Vector3 &Position) {
+  auto entity = SpawnFromTypeId(TypeId);
+
+  if (entity) {
+    entity->GetRoot()->setPosition(Position);
   }
 }
 

@@ -14,3 +14,25 @@ float Line::GetLength() { return m_Length; }
 Ogre::Vector3 Line::Evaluate(const float &Distance) {
   return m_Direction * Distance;
 }
+
+void Line::SetMetadata(const nlohmann::json &Metadata) {
+  if (Metadata == nullptr) {
+    return;
+  }
+
+  m_Length = Metadata["len"];
+  auto dir = Metadata["dir"];
+
+  m_Direction = Ogre::Vector3(dir["x"], dir["y"], dir["z"]);
+}
+
+nlohmann::json Line::GetMetadata() const {
+  nlohmann::json meta;
+
+  meta["dir"] = {
+      {"x", m_Direction.x}, {"y", m_Direction.y}, {"z", m_Direction.z}};
+
+  meta["len"] = m_Length;
+
+  return meta;
+}

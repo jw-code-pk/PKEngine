@@ -12,7 +12,7 @@ bool Cube::Init() {
 
   auto m_SceneManager = world->GetSceneManager();
 
-  Ogre::Entity *cubeMesh = m_SceneManager->createEntity("Cube", "Cube.mesh");
+  Ogre::Entity *cubeMesh = m_SceneManager->createEntity("Cube.mesh");
   Ogre::SceneNode *cubeNode = GetRoot()->createChildSceneNode();
   cubeNode->attachObject(cubeMesh);
   cubeNode->setInheritScale(false);

@@ -25,5 +25,4 @@ void Curve::ShowGizmos() {
   visual->end();
 
   GetRoot()->attachObject(visual);
-  GetRoot()->setPosition(Ogre::Vector3::ZERO);
 }

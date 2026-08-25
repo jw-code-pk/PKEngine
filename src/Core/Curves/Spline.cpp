@@ -19,3 +19,26 @@ Ogre::Vector3 Spline::Evaluate(const float &Distance) {
 
   return m_Spline.interpolate(k);
 }
+
+void Spline::SetMetadata(const nlohmann::json &Metadata) {
+  if (Metadata == nullptr) {
+    return;
+  }
+
+  for (const auto &p : Metadata["points"]) {
+    auto point = Ogre::Vector3(p["x"], p["y"], p["z"]);
+  }
+}
+
+nlohmann::json Spline::GetMetadata() const {
+  nlohmann::json meta;
+
+  meta["points"] = nlohmann::json::array();
+
+  for (int i = 0; i < m_Spline.getNumPoints(); i++) {
+    auto p = m_Spline.getPoint(i);
+    meta["points"].push_back({{"x", p.x}, {"y", p.y}, {"z", p.z}});
+  }
+
+  return meta;
+}

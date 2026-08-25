@@ -10,9 +10,10 @@ public:
   virtual bool Init() override;
   virtual float GetLength() override;
   virtual Ogre::Vector3 Evaluate(const float &Distance) override;
+  virtual void SetMetadata(const nlohmann::json &Metadata) override;
+  virtual nlohmann::json GetMetadata() const override;
 
   void Setup(const float &Radius, const Ogre::Degree &Angle);
-  void ShowGizmos();
 
 private:
   float m_Radius;

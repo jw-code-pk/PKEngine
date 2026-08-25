@@ -11,4 +11,5 @@ public:
 
 private:
   DebugLevel *m_Level;
+  int m_EntityTypeSelectIndex;
 };
