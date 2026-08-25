@@ -1,11 +1,22 @@
 cmake_minimum_required(VERSION 3.10)
+
+if (APPLE) 
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "26.5" CACHE STRING "Minimum macOS version" FORCE)
+endif()
+
 project(PKEngine)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) 
 
-set(OGRE_SDK "/Users/jewagenaar/SDK/ogre/sdk") 
+if(WIN32)
+    set(USER_HOME $ENV{USERPROFILE})
+else()
+    set(USER_HOME $ENV{HOME})
+endif()
+
+set(OGRE_SDK "${USER_HOME}/SDK/ogre/sdk") 
 list(APPEND CMAKE_PREFIX_PATH "${OGRE_SDK}")
 find_package(OGRE REQUIRED COMPONENTS Bites RTShaderSystem)
 find_package(SDL2 REQUIRED)
