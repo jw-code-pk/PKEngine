@@ -15,6 +15,11 @@ World::World(Ogre::SceneManager *SceneManager,
 }
 
 World::~World() {
+  if (m_ActiveLevel != nullptr) {
+    m_ActiveLevel->Cleanup();
+    delete m_ActiveLevel;
+  }
+
   GEngine::Unregister<World>(this);
   m_GUIs.clear();
   m_SceneManager = nullptr;

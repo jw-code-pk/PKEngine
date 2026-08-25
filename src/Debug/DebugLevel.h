@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Curves/CurveGroup.h"
 #include "Core/Entity.h"
 #include "Core/GUI.h"
 #include "Core/Level.h"
@@ -9,6 +10,7 @@
 class DebugLevel : public Level {
 public:
   virtual void Init() override;
+  virtual void Cleanup() override;
   virtual void Tick(const float &DeltaTime) override;
 
   void SelectNextEntity();
@@ -44,4 +46,6 @@ private:
   int m_CurrentIndex;
 
   GUI *m_GUI;
+
+  CurveGroup *m_CurveGroup;
 };

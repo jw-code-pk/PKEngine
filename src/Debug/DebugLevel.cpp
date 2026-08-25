@@ -44,6 +44,11 @@ void DebugLevel::Init() {
   m_Camera->attachObject(cam);
   m_Camera->setPosition(0, 0, 1500);
 
+  // Gameplay bits
+  m_CurveGroup = new CurveGroup();
+  GEngine::Register(m_CurveGroup);
+
+  // Editor bits
   m_GUI = new DebugGUI(this);
   world->AddGUI(m_GUI);
 
@@ -53,6 +58,8 @@ void DebugLevel::Init() {
 
   DisplayTestImage();
 }
+
+void DebugLevel::Cleanup() { delete m_CurveGroup; }
 
 void DebugLevel::Tick(const float &DeltaTime) {
   for (auto entity : m_TickList) {
@@ -261,6 +268,10 @@ Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
 
   if (result) {
     result->Init();
+
+    if (const auto curve = dynamic_cast<Curve *>(result)) {
+      m_CurveGroup->Register(curve);
+    }
 
     m_Entities.push_back(result);
 

@@ -1,10 +1,11 @@
 #include "Ninja.h"
+#include "Core/Curves/CurveGroup.h"
 #include "Core/GEngine.h"
 #include "Core/World.h"
 #include <OgreMath.h>
 #include <cassert>
 
-Ninja::Ninja(Ogre::SceneNode *Root) : Entity(Root) { m_CanTick = true; }
+Ninja::Ninja(Ogre::SceneNode *Root) : CurveFollower(Root) { m_CanTick = true; }
 
 bool Ninja::Init() {
   World *world = nullptr;
@@ -24,6 +25,20 @@ bool Ninja::Init() {
 
 void Ninja::Tick(const float &DeltaTime) {
   assert(m_PawnNode && "Pawn node should be initialised.");
+
+  if (!CurveFollower::HasCurve()) {
+    CurveGroup *curveGroup = nullptr;
+    const auto bHasCurveGroup = GEngine::TryGet(curveGroup);
+    assert(bHasCurveGroup && "No curve group registered.");
+
+    Curve *curve;
+    auto pos = GetRoot()->getPosition();
+    if (curveGroup->TryGetClosest(pos, curve)) {
+      CurveFollower::Follow(curve, 200, 0);
+    }
+  }
+
+  CurveFollower::Tick(DeltaTime);
 
   m_Rotation += DeltaTime * 200.0f;
   const auto targetRot =

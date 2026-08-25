@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/Entity.h"
+#include "Core/Curves/CurveFollower.h"
 #include <OgrePrerequisites.h>
 
-class Ninja : public Entity {
+class Ninja : public CurveFollower {
 public:
   Ninja(Ogre::SceneNode *Root);
 
