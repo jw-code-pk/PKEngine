@@ -27,6 +27,7 @@ void Ninja::Tick(const float &DeltaTime) {
   assert(m_PawnNode && "Pawn node should be initialised.");
 
   if (!CurveFollower::HasCurve()) {
+    // TODO: This probably needs to move somewhere else (maybe CurveFollower?)
     CurveGroup *curveGroup = nullptr;
     const auto bHasCurveGroup = GEngine::TryGet(curveGroup);
     assert(bHasCurveGroup && "No curve group registered.");

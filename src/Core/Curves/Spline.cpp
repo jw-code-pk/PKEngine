@@ -17,7 +17,8 @@ bool Spline::Init() {
 Ogre::Vector3 Spline::Evaluate(const float &Distance) {
   auto k = Distance / GetLength();
 
-  return m_Spline.interpolate(k);
+  auto localPos = m_Spline.interpolate(k);
+  return GetRoot()->convertLocalToWorldPosition(localPos);
 }
 
 void Spline::SetMetadata(const nlohmann::json &Metadata) {

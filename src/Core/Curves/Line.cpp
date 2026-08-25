@@ -12,7 +12,8 @@ bool Line::Init() { return true; }
 float Line::GetLength() { return m_Length; }
 
 Ogre::Vector3 Line::Evaluate(const float &Distance) {
-  return m_Direction * Distance;
+  auto localPos = m_Direction * Distance;
+  return GetRoot()->convertLocalToWorldPosition(localPos);
 }
 
 void Line::SetMetadata(const nlohmann::json &Metadata) {

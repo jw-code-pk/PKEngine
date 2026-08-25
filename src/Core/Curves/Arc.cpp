@@ -18,7 +18,9 @@ Ogre::Vector3 Arc::Evaluate(const float &Distance) {
   auto x = m_Radius * Ogre::Math::Cos(a);
   auto z = m_Radius * Ogre::Math::Sin(a);
 
-  return Ogre::Vector3(x, 0, z);
+  auto localPos = Ogre::Vector3(x, 0, z);
+
+  return GetRoot()->convertLocalToWorldPosition(localPos);
 }
 
 void Arc::SetMetadata(const nlohmann::json &Metadata) {

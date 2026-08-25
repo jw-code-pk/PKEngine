@@ -21,8 +21,9 @@ void Curve::ShowGizmos() {
   for (int i = 0; i <= numSegments; i++) {
     auto k = static_cast<float>(i) / static_cast<float>(numSegments);
     auto pos = Evaluate(k * length);
+    auto localPos = GetRoot()->convertWorldToLocalPosition(pos);
 
-    visual->position(pos);
+    visual->position(localPos);
     visual->colour(Ogre::ColourValue::Green);
   }
 
