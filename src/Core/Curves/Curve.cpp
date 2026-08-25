@@ -14,7 +14,7 @@ void Curve::ShowGizmos() {
 
   auto length = GetLength();
   auto numSegments = 10;
-  for (int i = 0; i < numSegments; i++) {
+  for (int i = 0; i <= numSegments; i++) {
     auto k = static_cast<float>(i) / static_cast<float>(numSegments);
     auto pos = Evaluate(k * length);
 

@@ -22,12 +22,16 @@ public:
 
   Ogre::String GetEntityTypeId();
 
+  void CameraToEntity();
+
   void SaveLevel(const Ogre::String &Name);
 
 protected:
   void DisplayTestImage();
 
 private:
+  Ogre::SceneNode *m_Camera;
+
   std::vector<Entity *> m_TickList;
   std::vector<Entity *> m_Entities;
 

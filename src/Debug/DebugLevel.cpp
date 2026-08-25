@@ -28,6 +28,7 @@ void DebugLevel::Init() {
   const auto bHasWorld = GEngine::TryGet(world);
   assert(bHasWorld && "No world is registered.");
 
+  // Scene setup
   auto sceneManager = world->GetSceneManager();
 
   Ogre::Light *light = sceneManager->createLight("MainLight");
@@ -36,13 +37,13 @@ void DebugLevel::Init() {
   lightNode->attachObject(light);
   lightNode->setPosition(120, 180, 150);
 
-  Ogre::SceneNode *camNode =
-      sceneManager->getRootSceneNode()->createChildSceneNode();
+  m_Camera = sceneManager->getRootSceneNode()->createChildSceneNode();
   Ogre::Camera *cam = world->CreateCamera("MainCam");
   cam->setNearClipDistance(5);
-  camNode->attachObject(cam);
-  camNode->setPosition(0, 0, 1500);
+  m_Camera->attachObject(cam);
+  m_Camera->setPosition(0, 0, 1500);
 
+  // Create entities
   auto ninja = world->CreateEntity<Ninja>();
   ninja->Init();
 
@@ -51,17 +52,13 @@ void DebugLevel::Init() {
   }
   m_Entities.push_back(ninja);
 
-  auto cube = world->CreateEntity<Cube>();
-  cube->Init();
-  m_Entities.push_back(cube);
-
   auto spline = world->CreateEntity<Spline>();
   spline->Init();
   m_Entities.push_back(spline);
 
   auto arc = world->CreateEntity<Arc>();
   arc->Init();
-  arc->Setup(250, Ogre::Degree(90));
+  arc->Setup(500, Ogre::Degree(90));
   m_Entities.push_back(arc);
 
   m_GUI = new DebugGUI(this);
@@ -168,6 +165,18 @@ Ogre::String DebugLevel::GetEntityTypeId() {
   }
 
   return m_Entities[m_CurrentIndex]->GetTypeId();
+}
+
+void DebugLevel::CameraToEntity() {
+  if (m_CurrentIndex < 0) {
+    return;
+  }
+
+  auto entityPos = m_Entities[m_CurrentIndex]->GetRoot()->getPosition();
+  auto origin = entityPos + Ogre::Vector3(0, 750, 1500);
+
+  m_Camera->setPosition(origin);
+  m_Camera->lookAt(entityPos, Ogre::Node::TS_WORLD);
 }
 
 void DebugLevel::SaveLevel(const Ogre::String &Name) {

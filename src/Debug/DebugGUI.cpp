@@ -8,12 +8,10 @@ DebugGUI::DebugGUI(DebugLevel *Level) { m_Level = Level; }
 void DebugGUI::Tick(const float &DeltaTime) {
   ImGui::Begin("Debug");
 
-  if (ImGui::Button("Add Cube")) {
-  }
+  auto entityId = m_Level->GetEntityTypeId();
+  ImGui::Text("%s", entityId.c_str());
 
-  if (ImGui::Button("Save")) {
-    m_Level->SaveLevel("Test.json");
-  }
+  // Entity focus
 
   if (ImGui::Button("Prev")) {
     m_Level->SelectPrevEntity();
@@ -24,6 +22,14 @@ void DebugGUI::Tick(const float &DeltaTime) {
   if (ImGui::Button("Next")) {
     m_Level->SelectNextEntity();
   }
+
+  ImGui::SameLine();
+
+  if (ImGui::Button("Snap Camera")) {
+    m_Level->CameraToEntity();
+  }
+
+  // Entity placement
 
   auto pos = m_Level->GetEntityPosition();
 
@@ -37,11 +43,10 @@ void DebugGUI::Tick(const float &DeltaTime) {
     m_Level->SetEntityRotation(rot);
   }
 
-  auto entityId = m_Level->GetEntityTypeId();
+  // Level operations
 
-  if (entityId == "Spline") {
-  ImGuiL:
-    ImGui::Text("Spline Selected");
+  if (ImGui::Button("Save Level")) {
+    m_Level->SaveLevel("Test.json");
   }
 
   ImGui::End();
