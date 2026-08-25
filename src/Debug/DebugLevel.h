@@ -20,6 +20,8 @@ public:
   Ogre::Vector3 GetEntityRotation();
   void SetEntityRotation(const Ogre::Vector3 &Rotation);
 
+  Ogre::String GetEntityTypeId();
+
   void SaveLevel(const Ogre::String &Name);
 
 protected:

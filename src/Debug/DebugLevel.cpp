@@ -1,4 +1,6 @@
 #include "DebugLevel.h"
+#include "Core/Curves/Arc.h"
+#include "Core/Curves/Spline.h"
 #include "Core/GEngine.h"
 #include "Core/ResourceLoader.h"
 #include "Core/World.h"
@@ -26,6 +28,21 @@ void DebugLevel::Init() {
   const auto bHasWorld = GEngine::TryGet(world);
   assert(bHasWorld && "No world is registered.");
 
+  auto sceneManager = world->GetSceneManager();
+
+  Ogre::Light *light = sceneManager->createLight("MainLight");
+  Ogre::SceneNode *lightNode =
+      sceneManager->getRootSceneNode()->createChildSceneNode();
+  lightNode->attachObject(light);
+  lightNode->setPosition(120, 180, 150);
+
+  Ogre::SceneNode *camNode =
+      sceneManager->getRootSceneNode()->createChildSceneNode();
+  Ogre::Camera *cam = world->CreateCamera("MainCam");
+  cam->setNearClipDistance(5);
+  camNode->attachObject(cam);
+  camNode->setPosition(0, 0, 1500);
+
   auto ninja = world->CreateEntity<Ninja>();
   ninja->Init();
 
@@ -37,6 +54,15 @@ void DebugLevel::Init() {
   auto cube = world->CreateEntity<Cube>();
   cube->Init();
   m_Entities.push_back(cube);
+
+  auto spline = world->CreateEntity<Spline>();
+  spline->Init();
+  m_Entities.push_back(spline);
+
+  auto arc = world->CreateEntity<Arc>();
+  arc->Init();
+  arc->Setup(250, Ogre::Degree(90));
+  m_Entities.push_back(arc);
 
   m_GUI = new DebugGUI(this);
   world->AddGUI(m_GUI);
@@ -134,6 +160,14 @@ void DebugLevel::SetEntityRotation(const Ogre::Vector3 &Rotation) {
   rotMat.FromEulerAnglesYXZ(yaw, pitch, roll);
 
   m_Entities[m_CurrentIndex]->GetRoot()->setOrientation(rotMat);
+}
+
+Ogre::String DebugLevel::GetEntityTypeId() {
+  if (m_CurrentIndex < 0) {
+    return Ogre::String();
+  }
+
+  return m_Entities[m_CurrentIndex]->GetTypeId();
 }
 
 void DebugLevel::SaveLevel(const Ogre::String &Name) {
