@@ -26,15 +26,16 @@ bool Ninja::Init() {
 void Ninja::Tick(const float &DeltaTime) {
   assert(m_PawnNode && "Pawn node should be initialised.");
 
-  if (!CurveFollower::HasCurve()) {
-    // TODO: This probably needs to move somewhere else (maybe CurveFollower?)
-    CurveGroup *curveGroup = nullptr;
-    const auto bHasCurveGroup = GEngine::TryGet(curveGroup);
-    assert(bHasCurveGroup && "No curve group registered.");
+  // TODO: This probably needs to move somewhere else (maybe CurveFollower?)
+  CurveGroup *curveGroup = nullptr;
+  const auto bHasCurveGroup = GEngine::TryGet(curveGroup);
+  assert(bHasCurveGroup && "No curve group registered.");
 
+  if (CurveFollower::IsCoyote()) {
     Curve *curve;
     auto pos = GetRoot()->getPosition();
-    if (curveGroup->TryGetClosest(pos, curve)) {
+    if (curveGroup->TryGetClosest(pos, curve,
+                                  CurveFollower::CurrentCurveId())) {
       CurveFollower::Follow(curve, 200, 0);
     }
   }

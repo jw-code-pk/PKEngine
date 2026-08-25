@@ -10,8 +10,13 @@ public:
   virtual void Tick(const float &DeltaTime) override;
 
   inline bool IsCoyote() {
-    return m_Distance < 0 || m_Distance > m_Curve->GetLength();
+    return !HasCurve() || m_Distance < 0 || m_Distance > m_Curve->GetLength();
   }
+
+  inline int CurrentCurveId() {
+    return HasCurve() ? m_Curve->GetCurveId() : -1;
+  }
+
   bool HasCurve() { return m_Curve != nullptr; }
   void Follow(Curve *Curve, const float &Speed, const float &StartDistance = 0);
 
