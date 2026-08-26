@@ -43,8 +43,7 @@ void Ninja::Tick(const float &DeltaTime) {
 
   CurveFollower::SetSpeed(speed);
 
-  m_Rotation += DeltaTime * 200.0f;
-
+  // m_Rotation += DeltaTime * 200.0f;
   // const auto targetRot =
   //     Ogre::Quaternion(Ogre::Degree(m_Rotation), Ogre::Vector3::UNIT_Y);
   // m_PawnNode->setOrientation(targetRot);

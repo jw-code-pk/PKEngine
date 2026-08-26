@@ -10,11 +10,11 @@ void CurveFollower::Tick(const float &DeltaTime) {
     return;
   }
 
+  m_Distance += m_Speed * DeltaTime;
+
   if (IsCoyote()) {
     return;
   }
-
-  m_Distance += m_Speed * DeltaTime;
 
   auto updatedPos = m_Curve->Evaluate(m_Distance);
   GetRoot()->setPosition(updatedPos);
