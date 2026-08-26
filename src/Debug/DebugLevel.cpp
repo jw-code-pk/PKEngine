@@ -163,6 +163,16 @@ Ogre::String DebugLevel::GetEntityTypeId() {
   return m_Entities[m_CurrentIndex]->GetTypeId();
 }
 
+bool DebugLevel::TryGetEntity(Entity *&OutEntity) {
+  if (m_CurrentIndex < 0) {
+    OutEntity = nullptr;
+    return false;
+  }
+
+  OutEntity = m_Entities[m_CurrentIndex];
+  return true;
+}
+
 void DebugLevel::CameraToEntity() {
   if (m_CurrentIndex < 0) {
     return;

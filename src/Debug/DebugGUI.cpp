@@ -4,11 +4,34 @@
 #include <OgrePrerequisites.h>
 
 const char *ENTITY_LIST[] = {"Ninja", "Arc", "Spline", "Line", "Cube"};
+const int PANEL_GAP = 8;
 
 DebugGUI::DebugGUI(DebugLevel *Level) { m_Level = Level; }
 
 void DebugGUI::Tick(const float &DeltaTime) {
-  ImGui::Begin("Debug");
+  ImGui::Begin("Editor");
+
+  if (ImGui::BeginMainMenuBar()) {
+    if (ImGui::BeginMenu("PK Engine")) {
+      if (ImGui::MenuItem("Save Level")) {
+        m_Level->SaveLevel("Test.json");
+      }
+      ImGui::EndMenu();
+    }
+    ImGui::EndMainMenuBar();
+  }
+
+  DrawLeftPanel();
+  ImGui::SameLine();
+  DrawRightPanel();
+  ImGui::End();
+}
+
+void DebugGUI::DrawLeftPanel() {
+  auto windowX = ImGui::GetContentRegionAvail().x;
+  auto panelW = windowX * 0.4f;
+
+  ImGui::BeginChild("LeftPanel", ImVec2(panelW, 0), true);
 
   // Entity creation
   ImGui::SeparatorText("Create");
@@ -20,8 +43,8 @@ void DebugGUI::Tick(const float &DeltaTime) {
     m_Level->CreateEntity(ENTITY_LIST[m_EntityTypeSelectIndex]);
   }
 
-  // Entity focus
-  ImGui::SeparatorText("Entity");
+  // Entity select
+  ImGui::SeparatorText("Select");
 
   auto entityId = m_Level->GetEntityTypeId();
   ImGui::Text("Selected [%s]", entityId.c_str());
@@ -42,13 +65,7 @@ void DebugGUI::Tick(const float &DeltaTime) {
     m_Level->SelectNextEntity();
   }
 
-  ImGui::SameLine();
-
-  if (ImGui::Button("Snap Camera")) {
-    m_Level->CameraToEntity();
-  }
-
-  // Entity placement
+  // Entity transform
   ImGui::SeparatorText("Transform");
 
   auto pos = m_Level->GetEntityPosition();
@@ -75,6 +92,13 @@ void DebugGUI::Tick(const float &DeltaTime) {
     m_Level->SetEntityRotation(Ogre::Vector3::ZERO);
   }
 
+  // Camera operations
+  ImGui::SeparatorText("Camera");
+
+  if (ImGui::Button("Snap Camera")) {
+    m_Level->CameraToEntity();
+  }
+
   // Level operations
   ImGui::SeparatorText("Level");
 
@@ -88,11 +112,77 @@ void DebugGUI::Tick(const float &DeltaTime) {
     m_Level->SetTickEnabled(false);
   }
 
-  ImGui::Separator();
+  ImGui::EndChild();
+}
 
-  if (ImGui::Button("Save Level")) {
-    m_Level->SaveLevel("Test.json");
+void DebugGUI::DrawRightPanel() {
+  auto windowX = ImGui::GetContentRegionAvail().x;
+  auto panelW = windowX - PANEL_GAP;
+
+  ImGui::BeginChild("RightPanel", ImVec2(panelW, 0), true);
+
+  Entity *entity;
+
+  if (m_Level->TryGetEntity(entity)) {
+    if (entity->GetTypeId() == "Arc") {
+      DrawArcControls(entity);
+    } else if (entity->GetTypeId() == "Line") {
+      DrawLineControls(entity);
+    } else if (entity->GetTypeId() == "Spline") {
+      DrawSplineControls(entity);
+    }
   }
 
-  ImGui::End();
+  ImGui::EndChild();
+}
+
+void DebugGUI::DrawArcControls(Entity *entity) {
+  auto meta = entity->GetMetadata();
+  auto angle = meta["angle"].get<float>();
+  auto radius = meta["radius"].get<float>();
+  auto winding = meta["winding"].get<int>();
+
+  if (ImGui::InputFloat("Angle", &angle)) {
+    meta["angle"] = angle;
+    entity->SetMetadata(meta);
+  }
+
+  if (ImGui::InputFloat("Radius", &radius)) {
+    meta["radius"] = radius;
+
+    if (radius > 0) {
+      entity->SetMetadata(meta);
+    }
+  }
+
+  if (ImGui::InputInt("Winding", &winding)) {
+    meta["winding"] = winding;
+
+    if (winding == -1 || winding == 1) {
+      entity->SetMetadata(meta);
+    }
+  }
+}
+
+void DebugGUI::DrawLineControls(Entity *entity) {
+  auto meta = entity->GetMetadata();
+  auto len = meta["len"].get<float>();
+  auto dir = meta["dir"];
+  auto dirVec = Ogre::Vector3(dir["x"], dir["y"], dir["z"]);
+
+  if (ImGui::InputFloat("Length", &len)) {
+    meta["len"] = len;
+    entity->SetMetadata(meta);
+  }
+
+  if (ImGui::InputFloat3("Direction", &dirVec.x)) {
+    meta["dir"] = {{"x", dirVec.x}, {"y", dirVec.y}, {"z", dirVec.z}};
+    entity->SetMetadata(meta);
+  }
+}
+
+void DebugGUI::DrawSplineControls(Entity *entity) {
+  auto meta = entity->GetMetadata();
+
+  // TODO: implement spline controls
 }

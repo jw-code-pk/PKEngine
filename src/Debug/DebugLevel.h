@@ -23,6 +23,7 @@ public:
   void SetEntityRotation(const Ogre::Vector3 &Rotation);
 
   Ogre::String GetEntityTypeId();
+  bool TryGetEntity(Entity *&OutEntity);
 
   void CameraToEntity();
 

@@ -13,9 +13,11 @@ public:
   virtual void SetMetadata(const nlohmann::json &Metadata) override;
   virtual nlohmann::json GetMetadata() const override;
 
-  void Setup(const float &Radius, const Ogre::Degree &Angle);
+  void Setup(const float &Radius, const Ogre::Degree &Angle,
+             const float &Winding = 1);
 
 private:
   float m_Radius;
+  int m_Winding;
   Ogre::Degree m_Angle;
 };
