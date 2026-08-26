@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include <OgrePrerequisites.h>
 
-const char *ENTITY_LIST[] = {"Ninja", "Arc", "Spline", "Line", "Cube"};
+const char *ENTITY_LIST[] = {"Ninja", "Arc", "Line", "Cube"};
 const int PANEL_GAP = 8;
 
 DebugGUI::DebugGUI(DebugLevel *Level) { m_Level = Level; }

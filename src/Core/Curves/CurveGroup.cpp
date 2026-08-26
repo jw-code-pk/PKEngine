@@ -18,7 +18,6 @@ void CurveGroup::Unregister(Curve *Curve) {
 
 bool CurveGroup::TryGetClosest(const Ogre::Vector3 &Position, Curve *&Curve,
                                const int IgnoreId) const {
-
   assert(m_Curves.size() > 0 && "There are no curves registered.");
 
   auto tolerance = 10.0f;

@@ -45,9 +45,8 @@ Ogre::Vector3 Curve::FindClosestPoint(const Ogre::Vector3 &Position,
   assert(Tolerance >= 1.0f && "Tolerance can't be smaller than 1.0f.");
 
   const auto length = GetLength();
-  const auto toleranceSq = Tolerance * Tolerance;
-  const auto numSamples = static_cast<int>(length * 0.5f / Tolerance);
-  const auto step = length / numSamples;
+  const auto numSamples = static_cast<int>(length / Tolerance);
+  const auto step = length / static_cast<float>(numSamples);
 
   auto closestPoint = Evaluate(0);
 
