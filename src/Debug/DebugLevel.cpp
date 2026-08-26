@@ -25,12 +25,22 @@
 using json = nlohmann::json;
 
 void DebugLevel::Init() {
-  World *world = nullptr;
-  const auto bHasWorld = GEngine::TryGet(world);
-  assert(bHasWorld && "No world is registered.");
+  World *world = GEngine::Get<World>();
 
   // Scene setup
   auto sceneManager = world->GetSceneManager();
+  sceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+  sceneManager->setSkyBox(true, "Examples/SpaceSkyBox", 5000.0f);
+
+  Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -1);
+  Ogre::MeshManager::getSingleton().createPlane(
+      "GroundPlane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+      plane, 10000, 10000, 20, 20, true, 1, 50, 50, Ogre::Vector3::UNIT_Z);
+
+  Ogre::Entity *groundEntity = sceneManager->createEntity("GroundPlane");
+  sceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(
+      groundEntity);
+  groundEntity->setMaterialName("Examples/GrassFloor");
 
   Ogre::Light *light = sceneManager->createLight("MainLight");
   Ogre::SceneNode *lightNode =
@@ -279,10 +289,7 @@ void DebugLevel::DeleteEntity() {
   }
 
   auto entity = m_Entities[m_CurrentIndex];
-
-  World *world = nullptr;
-  const auto bHasWorld = GEngine::TryGet(world);
-  assert(bHasWorld && "No world is registered.");
+  auto world = GEngine::Get<World>();
 
   if (const auto curve = dynamic_cast<Curve *>(entity)) {
     m_CurveGroup->Unregister(curve);
@@ -299,10 +306,7 @@ void DebugLevel::DeleteEntity() {
 }
 
 Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
-  World *world = nullptr;
-  const auto bHasWorld = GEngine::TryGet(world);
-  assert(bHasWorld && "No world is registered.");
-
+  auto world = GEngine::Get<World>();
   Entity *result = nullptr;
 
   if (TypeId == "Ninja") {
@@ -336,9 +340,7 @@ Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
 
 void DebugLevel::DisplayTestImage() {
   // Load resources
-  ResourceLoader *resourceLoader = nullptr;
-  const auto bHasResourceLoader = GEngine::TryGet(resourceLoader);
-  assert(bHasResourceLoader && "No resource loader registered.");
+  auto resourceLoader = GEngine::Get<ResourceLoader>();
   resourceLoader->CreateUIMaterial("UIShared", "UIImageMaterial", "test.png");
 
   // Display the image

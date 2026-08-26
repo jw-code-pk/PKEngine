@@ -9,9 +9,7 @@ static int NextID = 0;
 Curve::Curve(Ogre::SceneNode *Root) : Entity(Root) { m_CurveID = NextID++; }
 
 void Curve::ShowGizmos() {
-  World *world = nullptr;
-  const auto bHasWorld = GEngine::TryGet(world);
-  assert(bHasWorld && "No world is registered.");
+  World *world = GEngine::Get<World>();
 
   auto gizmoId = std::format("{}_{}", GetTypeId(), GetCurveId());
   auto sceneManager = world->GetSceneManager();

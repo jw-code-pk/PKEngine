@@ -6,10 +6,7 @@
 Cube::Cube(Ogre::SceneNode *Root) : Entity(Root) { m_CanTick = false; }
 
 bool Cube::Init() {
-  World *world = nullptr;
-  const auto bHasWorld = GEngine::TryGet(world);
-  assert(bHasWorld && "No world is registered.");
-
+  World *world = GEngine::Get<World>();
   auto m_SceneManager = world->GetSceneManager();
 
   Ogre::Entity *cubeMesh = m_SceneManager->createEntity("Cube.mesh");

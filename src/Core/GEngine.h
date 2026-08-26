@@ -23,21 +23,20 @@ public:
     msSingleton->m_Resources[key] = val;
   }
 
-  template <typename T> static bool TryGet(T *&Res) {
+  template <typename T> static T *Get() {
     assert(msSingleton && "GEngine instance not ready yet.");
-
-    Res = nullptr;
 
     const auto key = std::type_index(typeid(T));
     auto iter = msSingleton->m_Resources.find(key);
     if (iter != msSingleton->m_Resources.end()) {
-      Res = static_cast<T *>(iter->second);
-      return true;
+      return static_cast<T *>(iter->second);
     }
 
-    assert(Res && "Resource was not found.");
+    assert(
+        std::format("Resource of type {} is not available.", typeid(T).name())
+            .c_str());
 
-    return false;
+    return nullptr;
   }
 
   template <typename T> static void Unregister(T *Res) {

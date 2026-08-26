@@ -7,6 +7,7 @@
 #include <OgreSceneManager.h>
 #include <OgreTrays.h>
 
+#include "Input/InputManager.h"
 #include "ResourceLoader.h"
 #include "World.h"
 
@@ -24,7 +25,6 @@ public:
   bool frameStarted(const Ogre::FrameEvent &evt) override;
   bool keyPressed(const OgreBites::KeyboardEvent &evt) override;
   bool keyReleased(const OgreBites::KeyboardEvent &evt) override;
-  bool mouseMoved(const OgreBites::MouseMotionEvent &evt) override;
 
   // App public interface
   Ogre::SceneManager *GetSceneManager() const;
@@ -32,6 +32,7 @@ public:
 private:
   World *m_World;
   ResourceLoader *m_ResourceLoader;
+  InputManager *m_InputManager;
   Ogre::SceneManager *m_SceneManager;
   OgreBites::TrayManager *m_TrayManager;
 };

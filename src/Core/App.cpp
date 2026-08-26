@@ -8,7 +8,6 @@
 #include <imgui.h>
 
 #include <cassert>
-#include <memory>
 
 void App::setup() {
   OgreBites::ApplicationContext::setup();
@@ -33,6 +32,9 @@ void App::setup() {
   m_ResourceLoader = new ResourceLoader();
   m_ResourceLoader->LoadConfig();
 
+  m_InputManager = new InputManager();
+  m_InputManager->LoadMappings();
+
   m_World = new World(m_SceneManager, getRenderWindow());
   m_World->LoadLevel();
 
@@ -52,6 +54,7 @@ void App::shutdown() {
 
   delete m_World;
   delete m_ResourceLoader;
+  delete m_InputManager;
 
   OgreBites::ApplicationContext::shutdown();
 }
@@ -86,11 +89,12 @@ bool App::keyPressed(const OgreBites::KeyboardEvent &evt) {
     getRoot()->queueEndRendering();
     return true;
   }
-  return false;
+
+  return m_InputManager->OnKeyDown(evt);
 }
 
-bool App::keyReleased(const OgreBites::KeyboardEvent &evt) { return true; }
-
-bool App::mouseMoved(const OgreBites::MouseMotionEvent &evt) { return true; }
+bool App::keyReleased(const OgreBites::KeyboardEvent &evt) {
+  return m_InputManager->OnKeyUp(evt);
+}
 
 Ogre::SceneManager *App::GetSceneManager() const { return m_SceneManager; }

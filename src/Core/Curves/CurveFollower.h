@@ -19,6 +19,7 @@ public:
 
   bool HasCurve() { return m_Curve != nullptr; }
   void Follow(Curve *Curve, const float &Speed, const float &StartDistance = 0);
+  void SetSpeed(const float &Speed) { m_Speed = Speed; }
 
 private:
   Curve *m_Curve;
