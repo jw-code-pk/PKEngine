@@ -2,12 +2,17 @@
 
 Line::Line(Ogre::SceneNode *Root) : Curve(Root) { m_CanTick = false; }
 
+bool Line::Init() {
+  Setup(Ogre::Vector3::UNIT_X, 1000);
+  return true;
+}
+
 void Line::Setup(const Ogre::Vector3 &Direction, const float &Length) {
   m_Direction = Direction;
   m_Length = Length;
-}
 
-bool Line::Init() { return true; }
+  Curve::ShowGizmos();
+}
 
 float Line::GetLength() { return m_Length; }
 
@@ -21,10 +26,10 @@ void Line::SetMetadata(const nlohmann::json &Metadata) {
     return;
   }
 
-  m_Length = Metadata["len"];
+  auto len = Metadata["len"];
   auto dir = Metadata["dir"];
 
-  m_Direction = Ogre::Vector3(dir["x"], dir["y"], dir["z"]);
+  Setup(Ogre::Vector3(dir["x"], dir["y"], dir["z"]), len);
 }
 
 nlohmann::json Line::GetMetadata() const {

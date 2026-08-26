@@ -13,8 +13,18 @@ void Curve::ShowGizmos() {
   const auto bHasWorld = GEngine::TryGet(world);
   assert(bHasWorld && "No world is registered.");
 
+  auto gizmoId = std::format("{}_{}", GetTypeId(), GetCurveId());
   auto sceneManager = world->GetSceneManager();
-  auto visual = sceneManager->createManualObject();
+
+  Ogre::ManualObject *visual = nullptr;
+
+  if (sceneManager->hasManualObject(gizmoId)) {
+    visual = sceneManager->getManualObject(gizmoId);
+    visual->clear();
+  } else {
+    visual = sceneManager->createManualObject(gizmoId);
+    GetRoot()->attachObject(visual);
+  }
 
   visual->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_LINE_STRIP);
 
@@ -30,8 +40,6 @@ void Curve::ShowGizmos() {
   }
 
   visual->end();
-
-  GetRoot()->attachObject(visual);
 }
 
 Ogre::Vector3 Curve::FindClosestPoint(const Ogre::Vector3 &Position,

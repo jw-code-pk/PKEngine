@@ -14,9 +14,9 @@ Ogre::Vector3 Arc::Evaluate(const float &Distance) {
 
   // L = angle * r, angle = L / r
 
-  auto a = Distance / m_Radius;
+  auto a = (GetLength() - Distance) / m_Radius;
   auto x = m_Radius * Ogre::Math::Cos(a);
-  auto z = m_Radius * Ogre::Math::Sin(a);
+  auto z = m_Radius * Ogre::Math::Sin(a) - m_Radius;
 
   auto localPos = Ogre::Vector3(x, 0, z);
 

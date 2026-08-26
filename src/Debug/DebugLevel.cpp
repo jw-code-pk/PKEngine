@@ -274,9 +274,18 @@ void DebugLevel::DeleteEntity() {
   const auto bHasWorld = GEngine::TryGet(world);
   assert(bHasWorld && "No world is registered.");
 
+  if (const auto curve = dynamic_cast<Curve *>(entity)) {
+    m_CurveGroup->Unregister(curve);
+  }
+
   world->GetSceneManager()->destroySceneNode(entity->GetRoot());
   m_Entities.erase(m_Entities.begin() + m_CurrentIndex);
   delete entity;
+
+  if (m_Entities.size() > 0) {
+    m_CurrentIndex = m_Entities.size() - 1;
+    m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
+  }
 }
 
 Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
