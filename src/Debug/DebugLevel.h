@@ -26,11 +26,14 @@ public:
 
   void CameraToEntity();
 
+  void SetTickEnabled(const bool &bIsEnabled);
+
   void SaveLevel(const Ogre::String &Name);
   void LoadLevel(const Ogre::String &Name);
 
   void CreateEntity(const Ogre::String &TypeId,
                     const Ogre::Vector3 &Position = Ogre::Vector3::ZERO);
+  void DeleteEntity();
 
 protected:
   Entity *SpawnFromTypeId(const Ogre::String &TypeId);
@@ -43,6 +46,7 @@ private:
   std::vector<Entity *> m_TickList;
   std::vector<Entity *> m_Entities;
 
+  bool m_IsTickEnabled;
   int m_CurrentIndex;
 
   GUI *m_GUI;

@@ -62,6 +62,10 @@ void DebugLevel::Init() {
 void DebugLevel::Cleanup() { delete m_CurveGroup; }
 
 void DebugLevel::Tick(const float &DeltaTime) {
+  if (!m_IsTickEnabled) {
+    return;
+  }
+
   for (auto entity : m_TickList) {
     entity->Tick(DeltaTime);
   }
@@ -171,6 +175,10 @@ void DebugLevel::CameraToEntity() {
   m_Camera->lookAt(entityPos, Ogre::Node::TS_WORLD);
 }
 
+void DebugLevel::SetTickEnabled(const bool &bIsEnabled) {
+  m_IsTickEnabled = bIsEnabled;
+}
+
 void DebugLevel::SaveLevel(const Ogre::String &Name) {
   json levelData;
   levelData["entities"] = json::array();
@@ -245,6 +253,30 @@ void DebugLevel::CreateEntity(const Ogre::String &TypeId,
   if (entity) {
     entity->GetRoot()->setPosition(Position);
   }
+
+  if (m_CurrentIndex >= 0) {
+    m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
+  }
+
+  m_CurrentIndex = m_Entities.size() - 1;
+
+  entity->GetRoot()->showBoundingBox(true);
+}
+
+void DebugLevel::DeleteEntity() {
+  if (m_CurrentIndex >= 0) {
+    m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
+  }
+
+  auto entity = m_Entities[m_CurrentIndex];
+
+  World *world = nullptr;
+  const auto bHasWorld = GEngine::TryGet(world);
+  assert(bHasWorld && "No world is registered.");
+
+  world->GetSceneManager()->destroySceneNode(entity->GetRoot());
+  m_Entities.erase(m_Entities.begin() + m_CurrentIndex);
+  delete entity;
 }
 
 Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {

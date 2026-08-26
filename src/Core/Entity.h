@@ -7,6 +7,8 @@ class Entity {
 public:
   Entity(Ogre::SceneNode *Root) { m_Root = Root; }
 
+  virtual ~Entity() = default;
+
   virtual Ogre::String GetTypeId() = 0;
 
   virtual bool Init() { return true; }
