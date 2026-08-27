@@ -2,6 +2,7 @@
 
 #include "Core/Entity.h"
 #include "Curve.h"
+#include "CurveGroup.h"
 
 class CurveFollower : public Entity {
 public:
@@ -18,7 +19,9 @@ public:
   }
 
   bool HasCurve() { return m_Curve != nullptr; }
-  void Follow(Curve *Curve, const float &Speed, const float &StartDistance = 0);
+  void Follow(Curve *Curve, const float &StartDistance = 0);
+  void FollowClosest(const Ogre::Vector3 &Position, CurveGroup *Group);
+
   void SetSpeed(const float &Speed) { m_Speed = Speed; }
 
 private:

@@ -4,6 +4,11 @@
 
 class Curve : public Entity {
 public:
+  struct QueryResult {
+    float Distance;
+    Ogre::Vector3 Point;
+  };
+
   Curve(Ogre::SceneNode *Root);
 
   virtual float GetLength() = 0;
@@ -13,8 +18,8 @@ public:
 
   int GetCurveId() const { return m_CurveID; }
 
-  Ogre::Vector3 FindClosestPoint(const Ogre::Vector3 &Position,
-                                 const float &Step = 1.0f);
+  QueryResult FindClosestPoint(const Ogre::Vector3 &Position,
+                               const float &Step = 1.0f);
 
 private:
   int m_CurveID;

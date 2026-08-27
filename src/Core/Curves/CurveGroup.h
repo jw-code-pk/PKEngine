@@ -4,11 +4,18 @@
 
 class CurveGroup {
 public:
+  struct QueryResult {
+    Curve *Curve;
+    float Distance;
+
+    bool IsValid() { return Curve != nullptr; }
+  };
+
   void Register(Curve *Curve);
   void Unregister(Curve *Curve);
 
-  bool TryGetClosest(const Ogre::Vector3 &Position, Curve *&Curve,
-                     const int IgnoreId = -1) const;
+  QueryResult FindClosest(const Ogre::Vector3 &Position,
+                          const int IgnoreId = -1) const;
 
 private:
   std::unordered_map<int, Curve *> m_Curves;
