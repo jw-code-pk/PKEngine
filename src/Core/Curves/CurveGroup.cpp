@@ -18,11 +18,12 @@ void CurveGroup::Unregister(Curve *Curve) {
 
 bool CurveGroup::TryGetClosest(const Ogre::Vector3 &Position, Curve *&Curve,
                                const int IgnoreId) const {
+
   assert(m_Curves.size() > 0 && "There are no curves registered.");
 
-  auto tolerance = 10.0f;
+  auto stepSize = 10;
   Curve = m_Curves.begin()->second;
-  auto closestPoint = Curve->FindClosestPoint(Position, tolerance);
+  auto closestPoint = Ogre::Vector3::UNIT_SCALE * stepSize * 2;
 
   for (const auto &kvp : m_Curves) {
     if (kvp.first == IgnoreId) {
@@ -30,7 +31,7 @@ bool CurveGroup::TryGetClosest(const Ogre::Vector3 &Position, Curve *&Curve,
     }
 
     auto c = kvp.second;
-    auto p = c->FindClosestPoint(Position, tolerance);
+    auto p = c->FindClosestPoint(Position, stepSize);
 
     const auto d1 = Position.squaredDistance(closestPoint);
     const auto d2 = Position.squaredDistance(p);

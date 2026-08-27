@@ -14,4 +14,6 @@ struct InputState {
   Ogre::Vector2 Axis;
   ActionState Jump;
   ActionState Attack;
+
+  bool HasAxisInput() { return Axis.x > 0 || Axis.x < 0; }
 };

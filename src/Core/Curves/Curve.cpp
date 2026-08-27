@@ -41,17 +41,16 @@ void Curve::ShowGizmos() {
 }
 
 Ogre::Vector3 Curve::FindClosestPoint(const Ogre::Vector3 &Position,
-                                      const float &Tolerance) {
-  assert(Tolerance >= 1.0f && "Tolerance can't be smaller than 1.0f.");
+                                      const float &Step) {
+  assert(Step >= 1.0f && "Step size can't be smaller than 1.0f.");
 
   const auto length = GetLength();
-  const auto numSamples = static_cast<int>(length / Tolerance);
-  const auto step = length / static_cast<float>(numSamples);
+  const auto numSamples = static_cast<int>(length / Step);
 
   auto closestPoint = Evaluate(0);
 
   for (int i = 1; i < numSamples; i++) {
-    const auto k = i * step;
+    const auto k = i * Step;
     const auto p = Evaluate(k);
 
     const auto d1 = Position.squaredDistance(closestPoint);

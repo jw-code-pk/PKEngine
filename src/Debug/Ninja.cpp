@@ -24,21 +24,25 @@ bool Ninja::Init() {
 void Ninja::Tick(const float &DeltaTime) {
   assert(m_PawnNode && "Pawn node should be initialised.");
 
+  auto inputState = GEngine::Get<InputState>();
+
   // TODO: This probably needs to move somewhere else (maybe CurveFollower?)
   // also not sure if GEngine is the place for level resources
   auto curveGroup = GEngine::Get<CurveGroup>();
-  if (CurveFollower::IsCoyote()) {
+  if (inputState->HasAxisInput() && CurveFollower::IsCoyote()) {
     Curve *curve;
     auto pos = GetRoot()->getPosition();
     if (curveGroup->TryGetClosest(pos, curve,
                                   CurveFollower::CurrentCurveId())) {
-      CurveFollower::Follow(curve, 0, 0);
+
+      const auto startDistance =
+          inputState->Axis.x > 0 ? 0 : curve->GetLength();
+      CurveFollower::Follow(curve, 0, startDistance);
     }
   }
 
   CurveFollower::Tick(DeltaTime);
 
-  auto inputState = GEngine::Get<InputState>();
   auto speed = inputState->Axis.x * 200;
 
   CurveFollower::SetSpeed(speed);
