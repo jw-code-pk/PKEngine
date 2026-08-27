@@ -1,12 +1,21 @@
 #include "Ninja.h"
-#include "Core/Curves/CurveGroup.h"
+#include "NinjaSM/States/NinjaIdleState.h"
+#include "NinjaSM/States/NinjaWalkState.h"
+
 #include "Core/GEngine.h"
-#include "Core/Input/InputState.h"
 #include "Core/World.h"
 #include <OgreMath.h>
 #include <cassert>
 
-Ninja::Ninja(Ogre::SceneNode *Root) : CurveFollower(Root) { m_CanTick = true; }
+Ninja::Ninja(Ogre::SceneNode *Root) : CurveFollower(Root) {
+  m_CanTick = true;
+  m_StateMachine = new NinjaSM(this);
+}
+
+Ninja::~Ninja() {
+  m_StateMachine->RemoveAllStates(true);
+  delete m_StateMachine;
+}
 
 bool Ninja::Init() {
   auto world = GEngine::Get<World>();
@@ -38,7 +47,9 @@ bool Ninja::Init() {
     }
   }
 
-  ChangeAnim("Idle2");
+  // Setup behaviour states
+  m_StateMachine->Register(new NinjaWalkState());
+  m_StateMachine->Register(new NinjaIdleState());
 
   return true;
 }
@@ -46,37 +57,18 @@ bool Ninja::Init() {
 void Ninja::BeginPlay() {
   auto world = GEngine::Get<World>();
   world->SetActiveCamera("NinjaCam");
+
+  m_StateMachine->ChangeState<NinjaIdleState>();
 }
 
 void Ninja::Tick(const float &DeltaTime) {
   assert(m_PawnNode && "Pawn node should be initialised.");
+  m_StateMachine->Tick(DeltaTime);
 
   CurveFollower::Tick(DeltaTime);
 
-  auto inputState = GEngine::Get<InputState>();
-
-  if (inputState->HasAxisInput() && CurveFollower::IsCoyote()) {
-    auto curveGroup = GEngine::Get<CurveGroup>();
-    FollowClosest(GetRoot()->getPosition(), curveGroup);
-  }
-
-  auto speed = inputState->Axis.x * 200;
-  CurveFollower::SetSpeed(speed);
-
-  if (inputState->HasAxisInput()) {
-    ChangeAnim("Walk");
-  } else {
-    ChangeAnim("Idle2");
-  }
-
-  if (speed > 0) {
-    m_PawnNode->setDirection(Ogre::Vector3::UNIT_X);
-  } else if (speed < 0) {
-    m_PawnNode->setDirection(-1 * Ogre::Vector3::UNIT_X);
-  }
-
   GetRoot()->setOrientation(CurveFollower::CalculateOrientation());
-  m_ActiveAnim->addTime(DeltaTime * 1.5);
+  m_ActiveAnim->addTime(DeltaTime * 3);
 }
 
 void Ninja::EndPlay() {}
@@ -98,4 +90,8 @@ void Ninja::ChangeAnim(const Ogre::String &Name) {
   m_ActiveAnim = m_AnimSet->getAnimationState(Name);
   m_ActiveAnim->setEnabled(true);
   m_ActiveAnim->setLoop(true);
+}
+
+void Ninja::FaceDirection(const Ogre::Vector3 &Direction) {
+  m_PawnNode->setDirection(Direction);
 }
