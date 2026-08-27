@@ -10,7 +10,10 @@ class DebugLevel : public Level {
 public:
   virtual void Init() override;
   virtual void Cleanup() override;
+
+  virtual void BeginPlay() override;
   virtual void Tick(const float &DeltaTime) override;
+  virtual void EndPlay() override;
 
   void SelectNextEntity();
   void SelectPrevEntity();

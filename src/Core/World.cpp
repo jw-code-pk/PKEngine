@@ -42,15 +42,27 @@ void World::UITick(const float &DeltaTime) {
   }
 }
 
-Ogre::Camera *World::CreateCamera(const std::string &Id) {
-  auto cam = m_SceneManager->createCamera(Id);
-  auto vp = m_RenderWindow->addViewport(cam);
+Ogre::Camera *World::CreateCamera(const Ogre::String &Name) {
+  assert(!m_Cameras.contains(Name) &&
+         std::format("Camera {} already exists.", Name).c_str());
 
-  Ogre::Real aspectRatio =
-      Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight());
-  cam->setAspectRatio(aspectRatio);
+  auto cam = m_SceneManager->createCamera(Name);
+  m_Cameras[Name] = cam;
 
   return cam;
+}
+
+void World::SetActiveCamera(const Ogre::String &Name) {
+  auto cam = m_Cameras[Name];
+
+  if (cam) {
+    m_RenderWindow->removeAllViewports();
+    auto vp = m_RenderWindow->addViewport(cam);
+
+    Ogre::Real aspectRatio =
+        Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight());
+    cam->setAspectRatio(aspectRatio);
+  }
 }
 
 void World::AddGUI(GUI *GUI) { m_GUIs.push_back(GUI); }

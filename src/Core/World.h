@@ -25,7 +25,9 @@ public:
     return entity;
   }
 
-  Ogre::Camera *CreateCamera(const std::string &Id);
+  Ogre::Camera *CreateCamera(const Ogre::String &Name);
+  void SetActiveCamera(const Ogre::String &Name);
+
   Ogre::SceneManager *GetSceneManager() { return m_SceneManager; }
 
   void AddGUI(GUI *GUI);
@@ -39,4 +41,5 @@ private:
   double m_WorldTime;
 
   std::vector<GUI *> m_GUIs;
+  std::map<Ogre::String, Ogre::Camera *> m_Cameras;
 };

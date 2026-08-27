@@ -25,9 +25,9 @@
 using json = nlohmann::json;
 
 void DebugLevel::Init() {
-  World *world = GEngine::Get<World>();
 
   // Scene setup
+  auto world = GEngine::Get<World>();
   auto sceneManager = world->GetSceneManager();
   sceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
   sceneManager->setSkyBox(true, "Examples/SpaceSkyBox", 5000.0f);
@@ -49,7 +49,9 @@ void DebugLevel::Init() {
   lightNode->setPosition(120, 180, 150);
 
   m_Camera = sceneManager->getRootSceneNode()->createChildSceneNode();
-  Ogre::Camera *cam = world->CreateCamera("MainCam");
+  Ogre::Camera *cam = world->CreateCamera("EditorCam");
+  world->SetActiveCamera("EditorCam");
+
   cam->setNearClipDistance(5);
   m_Camera->attachObject(cam);
   m_Camera->setPosition(0, 0, 1500);
@@ -71,14 +73,15 @@ void DebugLevel::Init() {
 
 void DebugLevel::Cleanup() { delete m_CurveGroup; }
 
-void DebugLevel::Tick(const float &DeltaTime) {
-  if (!m_IsTickEnabled) {
-    return;
-  }
+void DebugLevel::BeginPlay() { Level::BeginPlay(); }
 
-  for (auto entity : m_TickList) {
-    entity->Tick(DeltaTime);
-  }
+void DebugLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }
+
+void DebugLevel::EndPlay() {
+  Level::EndPlay();
+
+  auto world = GEngine::Get<World>();
+  world->SetActiveCamera("EditorCam");
 }
 
 void DebugLevel::SelectNextEntity() {

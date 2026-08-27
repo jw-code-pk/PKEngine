@@ -19,9 +19,13 @@ void CurveFollower::Tick(const float &DeltaTime) {
   if (!IsCoyote()) {
     updatedPos = m_Curve->Evaluate(m_Distance);
 
-    auto offset = currentPos - updatedPos;
+    auto offset = updatedPos - currentPos;
     if (offset.squaredLength() > 0) {
       m_Forward = offset.normalisedCopy();
+
+      if (m_Speed < 0) {
+        m_Forward *= -1;
+      }
     }
   }
 
@@ -49,5 +53,5 @@ void CurveFollower::FollowClosest(const Ogre::Vector3 &Position,
 }
 
 Ogre::Quaternion CurveFollower::CalculateOrientation() {
-  return Ogre::Vector3::UNIT_Z.getRotationTo(m_Forward);
+  return Ogre::Vector3::UNIT_X.getRotationTo(m_Forward);
 }

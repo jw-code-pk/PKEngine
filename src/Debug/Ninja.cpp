@@ -10,14 +10,28 @@ Ninja::Ninja(Ogre::SceneNode *Root) : CurveFollower(Root) { m_CanTick = true; }
 
 bool Ninja::Init() {
   auto world = GEngine::Get<World>();
-  auto m_SceneManager = world->GetSceneManager();
+  auto sceneManager = world->GetSceneManager();
 
-  Ogre::Entity *ninjaMesh = m_SceneManager->createEntity("ninja.mesh");
+  GetRoot()->setPosition(0, 0, 0);
+
+  Ogre::Entity *ninjaMesh = sceneManager->createEntity("ninja.mesh");
   m_PawnNode = GetRoot()->createChildSceneNode();
   m_PawnNode->attachObject(ninjaMesh);
   m_AnimSet = ninjaMesh->getAllAnimationStates();
+  m_PawnNode->setPosition(Ogre::Vector3::ZERO);
 
-  GetRoot()->setPosition(0, 0, 0);
+  Ogre::Camera *cam = world->CreateCamera("NinjaCam");
+  auto camNode = GetRoot()->createChildSceneNode();
+  camNode->attachObject(cam);
+  camNode->setPosition(0, 500, 1250);
+
+  auto pitch = -0.15 * Ogre::Math::HALF_PI;
+
+  camNode->pitch(Ogre::Radian(pitch));
+
+  // auto camDir = GetRoot()->getPosition() - camNode->getPosition();
+  // camDir.normalise();
+  // camNode->setDirection(camDir);
 
   // TODO: Debug - print all anim states
 
@@ -32,6 +46,11 @@ bool Ninja::Init() {
   ChangeAnim("Idle2");
 
   return true;
+}
+
+void Ninja::BeginPlay() {
+  auto world = GEngine::Get<World>();
+  world->SetActiveCamera("NinjaCam");
 }
 
 void Ninja::Tick(const float &DeltaTime) {
@@ -55,9 +74,17 @@ void Ninja::Tick(const float &DeltaTime) {
     ChangeAnim("Idle2");
   }
 
-  m_PawnNode->setOrientation(CurveFollower::CalculateOrientation());
-  m_ActiveAnim->addTime(DeltaTime);
+  if (speed > 0) {
+    m_PawnNode->setDirection(Ogre::Vector3::UNIT_X);
+  } else if (speed < 0) {
+    m_PawnNode->setDirection(-1 * Ogre::Vector3::UNIT_X);
+  }
+
+  GetRoot()->setOrientation(CurveFollower::CalculateOrientation());
+  m_ActiveAnim->addTime(DeltaTime * 1.5);
 }
+
+void Ninja::EndPlay() {}
 
 void Ninja::ChangeAnim(const Ogre::String &Name) {
   assert(m_AnimSet->hasAnimationState(Name) &&

@@ -9,7 +9,10 @@ public:
 
   virtual Ogre::String GetTypeId() override { return "Ninja"; }
   virtual bool Init() override;
+
+  virtual void BeginPlay() override;
   virtual void Tick(const float &DeltaTime) override;
+  virtual void EndPlay() override;
 
 protected:
   void ChangeAnim(const Ogre::String &Name);
