@@ -24,8 +24,11 @@ public:
 
   void SetSpeed(const float &Speed) { m_Speed = Speed; }
 
+  Ogre::Quaternion CalculateOrientation();
+
 private:
   Curve *m_Curve;
   float m_Speed;
   float m_Distance;
+  Ogre::Vector3 m_Forward;
 };

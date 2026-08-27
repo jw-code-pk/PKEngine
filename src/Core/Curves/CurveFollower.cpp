@@ -3,6 +3,7 @@
 
 CurveFollower::CurveFollower(Ogre::SceneNode *Root) : Entity(Root) {
   m_CanTick = true;
+  m_Forward = Ogre::Vector3::UNIT_X;
 }
 
 void CurveFollower::Tick(const float &DeltaTime) {
@@ -12,11 +13,18 @@ void CurveFollower::Tick(const float &DeltaTime) {
 
   m_Distance += m_Speed * DeltaTime;
 
-  if (IsCoyote()) {
-    return;
+  auto currentPos = GetRoot()->getPosition();
+  auto updatedPos = currentPos;
+
+  if (!IsCoyote()) {
+    updatedPos = m_Curve->Evaluate(m_Distance);
+
+    auto offset = currentPos - updatedPos;
+    if (offset.squaredLength() > 0) {
+      m_Forward = offset.normalisedCopy();
+    }
   }
 
-  auto updatedPos = m_Curve->Evaluate(m_Distance);
   GetRoot()->setPosition(updatedPos);
 }
 
@@ -38,4 +46,8 @@ void CurveFollower::FollowClosest(const Ogre::Vector3 &Position,
   if (queryResult.IsValid()) {
     Follow(queryResult.Curve, queryResult.Distance);
   }
+}
+
+Ogre::Quaternion CurveFollower::CalculateOrientation() {
+  return Ogre::Vector3::UNIT_Z.getRotationTo(m_Forward);
 }
