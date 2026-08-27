@@ -4,6 +4,7 @@
 #include <typeindex>
 #include <unordered_map>
 
+#include <Ogre.h>
 #include <OgreSingleton.h>
 
 class GEngine : public Ogre::Singleton<GEngine> {
@@ -44,6 +45,10 @@ public:
 
     const auto key = std::type_index(typeid(Res));
     msSingleton->m_Resources.erase(key);
+  }
+
+  static void Log(const Ogre::String &Msg) {
+    Ogre::LogManager::getSingleton().logMessage(Msg);
   }
 
 private:

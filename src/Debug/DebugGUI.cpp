@@ -103,6 +103,7 @@ void DebugGUI::DrawLeftPanel() {
   ImGui::SeparatorText("Level");
 
   if (ImGui::Button("Start")) {
+    m_Level->BeginPlay();
     m_Level->SetTickEnabled(true);
   }
 
@@ -110,6 +111,7 @@ void DebugGUI::DrawLeftPanel() {
 
   if (ImGui::Button("Stop")) {
     m_Level->SetTickEnabled(false);
+    m_Level->EndPlay();
   }
 
   ImGui::EndChild();

@@ -1,6 +1,7 @@
 #include "App.h"
 #include "Core/ResourceLoader.h"
 #include <OgreApplicationContextBase.h>
+#include <OgreConfigDialog.h>
 #include <OgreFrameListener.h>
 #include <OgreImGuiInputListener.h>
 #include <OgreImGuiOverlay.h>
@@ -14,13 +15,10 @@ void App::setup() {
   addInputListener(this);
 
   Ogre::Root *root = getRoot();
-  m_SceneManager = root->createSceneManager();
-
-  Ogre::RTShader::ShaderGenerator *shadergen =
-      Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-  shadergen->addSceneManager(m_SceneManager);
-
+  root->getRenderSystem()->setConfigOption("FSAA", "8");
   root->addFrameListener(this);
+
+  m_SceneManager = root->createSceneManager();
 
   m_SceneManager->addRenderQueueListener(mOverlaySystem);
 
@@ -39,6 +37,10 @@ void App::setup() {
   m_World->LoadLevel();
 
   // TODO: move these to members
+
+  Ogre::RTShader::ShaderGenerator *shadergen =
+      Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+  shadergen->addSceneManager(m_SceneManager);
 
   Ogre::ImGuiOverlay *imguiOverlay = new Ogre::ImGuiOverlay();
   imguiOverlay->setZOrder(300);

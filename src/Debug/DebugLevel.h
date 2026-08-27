@@ -5,7 +5,6 @@
 #include "Core/GUI.h"
 #include "Core/Level.h"
 #include <OgrePrerequisites.h>
-#include <vector>
 
 class DebugLevel : public Level {
 public:
@@ -27,8 +26,6 @@ public:
 
   void CameraToEntity();
 
-  void SetTickEnabled(const bool &bIsEnabled);
-
   void SaveLevel(const Ogre::String &Name);
   void LoadLevel(const Ogre::String &Name);
 
@@ -43,14 +40,8 @@ protected:
 
 private:
   Ogre::SceneNode *m_Camera;
-
-  std::vector<Entity *> m_TickList;
-  std::vector<Entity *> m_Entities;
-
-  bool m_IsTickEnabled;
-  int m_CurrentIndex;
-
-  GUI *m_GUI;
-
   CurveGroup *m_CurveGroup;
+
+  int m_CurrentIndex;
+  GUI *m_GUI;
 };

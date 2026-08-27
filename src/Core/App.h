@@ -21,8 +21,11 @@ public:
   void setup() override;
   void shutdown() override;
 
+  // Ogre frame hooks
   bool frameRenderingQueued(const Ogre::FrameEvent &evt) override;
   bool frameStarted(const Ogre::FrameEvent &evt) override;
+
+  // Ogre input hooks
   bool keyPressed(const OgreBites::KeyboardEvent &evt) override;
   bool keyReleased(const OgreBites::KeyboardEvent &evt) override;
 

@@ -15,8 +15,21 @@ bool Ninja::Init() {
   Ogre::Entity *ninjaMesh = m_SceneManager->createEntity("ninja.mesh");
   m_PawnNode = GetRoot()->createChildSceneNode();
   m_PawnNode->attachObject(ninjaMesh);
+  m_AnimSet = ninjaMesh->getAllAnimationStates();
 
   GetRoot()->setPosition(0, 0, 0);
+
+  // TODO: Debug - print all anim states
+
+  if (m_AnimSet) {
+    auto it = m_AnimSet->getAnimationStateIterator();
+    while (it.hasMoreElements()) {
+      auto animState = it.getNext();
+      GEngine::Log("Animation Name: " + animState->getAnimationName());
+    }
+  }
+
+  ChangeAnim("Idle2");
 
   return true;
 }
@@ -36,5 +49,31 @@ void Ninja::Tick(const float &DeltaTime) {
   auto speed = inputState->Axis.x * 200;
   CurveFollower::SetSpeed(speed);
 
+  if (inputState->HasAxisInput()) {
+    ChangeAnim("Walk");
+  } else {
+    ChangeAnim("Idle2");
+  }
+
   m_PawnNode->setOrientation(CurveFollower::CalculateOrientation());
+  m_ActiveAnim->addTime(DeltaTime);
+}
+
+void Ninja::ChangeAnim(const Ogre::String &Name) {
+  assert(m_AnimSet->hasAnimationState(Name) &&
+         std::format("Animation state {} is not available", Name).c_str());
+
+  if (m_ActiveAnim != nullptr) {
+    if (m_ActiveAnim->getAnimationName() == Name) {
+      return;
+    }
+
+    m_ActiveAnim->setTimePosition(0);
+    m_ActiveAnim->setEnabled(false);
+    m_ActiveAnim->setLoop(false);
+  }
+
+  m_ActiveAnim = m_AnimSet->getAnimationState(Name);
+  m_ActiveAnim->setEnabled(true);
+  m_ActiveAnim->setLoop(true);
 }

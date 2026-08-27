@@ -195,10 +195,6 @@ void DebugLevel::CameraToEntity() {
   m_Camera->lookAt(entityPos, Ogre::Node::TS_WORLD);
 }
 
-void DebugLevel::SetTickEnabled(const bool &bIsEnabled) {
-  m_IsTickEnabled = bIsEnabled;
-}
-
 void DebugLevel::SaveLevel(const Ogre::String &Name) {
   json levelData;
   levelData["entities"] = json::array();
