@@ -30,7 +30,7 @@ void DebugLevel::Init() {
   auto world = GEngine::Get<World>();
   auto sceneManager = world->GetSceneManager();
   sceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
-  sceneManager->setSkyBox(true, "Examples/SpaceSkyBox", 5000.0f);
+  sceneManager->setSkyBox(true, "Examples/SpaceSkyBox", 3000.0f);
 
   Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -1);
   Ogre::MeshManager::getSingleton().createPlane(

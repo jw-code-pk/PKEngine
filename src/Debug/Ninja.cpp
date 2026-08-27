@@ -26,12 +26,7 @@ bool Ninja::Init() {
   camNode->setPosition(0, 500, 1250);
 
   auto pitch = -0.15 * Ogre::Math::HALF_PI;
-
   camNode->pitch(Ogre::Radian(pitch));
-
-  // auto camDir = GetRoot()->getPosition() - camNode->getPosition();
-  // camDir.normalise();
-  // camNode->setDirection(camDir);
 
   // TODO: Debug - print all anim states
 
