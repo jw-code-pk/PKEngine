@@ -1,14 +1,16 @@
-#include "DebugGUI.h"
-#include "Debug/DebugLevel.h"
+#include "EditorGUI.h"
+#include "EditorLevel.h"
 #include "imgui.h"
 #include <OgrePrerequisites.h>
 
-const char *ENTITY_LIST[] = {"Ninja", "Arc", "Line", "Cube"};
 const int PANEL_GAP = 8;
 
-DebugGUI::DebugGUI(DebugLevel *Level) { m_Level = Level; }
+EditorGUI::EditorGUI(EditorLevel *Level) {
+  m_Level = Level;
+  m_EntityTypeSelectIndex = -1;
+}
 
-void DebugGUI::Tick(const float &DeltaTime) {
+void EditorGUI::Tick(const float &DeltaTime) {
   ImGui::Begin("Editor");
 
   if (ImGui::BeginMainMenuBar()) {
@@ -27,7 +29,7 @@ void DebugGUI::Tick(const float &DeltaTime) {
   ImGui::End();
 }
 
-void DebugGUI::DrawLeftPanel() {
+void EditorGUI::DrawLeftPanel() {
   auto windowX = ImGui::GetContentRegionAvail().x;
   auto panelW = windowX * 0.4f;
 
@@ -36,11 +38,23 @@ void DebugGUI::DrawLeftPanel() {
   // Entity creation
   ImGui::SeparatorText("Create");
 
-  ImGui::Combo("Entity Type", &m_EntityTypeSelectIndex, ENTITY_LIST,
-               IM_ARRAYSIZE(ENTITY_LIST));
+  auto entityList = m_Level->GetAvailableEntities();
+  auto selectedId = m_EntityTypeSelectIndex < 0
+                        ? "None"
+                        : entityList[m_EntityTypeSelectIndex];
+
+  if (ImGui::BeginCombo("Entity Type", selectedId.c_str())) {
+    for (int i = 0; i < entityList.size(); i++) {
+      if (ImGui::Selectable(entityList[i].c_str(),
+                            i == m_EntityTypeSelectIndex)) {
+        m_EntityTypeSelectIndex = i;
+      }
+    }
+    ImGui::EndCombo();
+  }
 
   if (ImGui::Button("Create")) {
-    m_Level->CreateEntity(ENTITY_LIST[m_EntityTypeSelectIndex]);
+    m_Level->CreateEntity(entityList[m_EntityTypeSelectIndex]);
   }
 
   // Entity select
@@ -117,7 +131,7 @@ void DebugGUI::DrawLeftPanel() {
   ImGui::EndChild();
 }
 
-void DebugGUI::DrawRightPanel() {
+void EditorGUI::DrawRightPanel() {
   auto windowX = ImGui::GetContentRegionAvail().x;
   auto panelW = windowX - PANEL_GAP;
 
@@ -130,15 +144,13 @@ void DebugGUI::DrawRightPanel() {
       DrawArcControls(entity);
     } else if (entity->GetTypeId() == "Line") {
       DrawLineControls(entity);
-    } else if (entity->GetTypeId() == "Spline") {
-      DrawSplineControls(entity);
     }
   }
 
   ImGui::EndChild();
 }
 
-void DebugGUI::DrawArcControls(Entity *entity) {
+void EditorGUI::DrawArcControls(Entity *entity) {
   auto meta = entity->GetMetadata();
   auto angle = meta["angle"].get<float>();
   auto radius = meta["radius"].get<float>();
@@ -166,7 +178,7 @@ void DebugGUI::DrawArcControls(Entity *entity) {
   }
 }
 
-void DebugGUI::DrawLineControls(Entity *entity) {
+void EditorGUI::DrawLineControls(Entity *entity) {
   auto meta = entity->GetMetadata();
   auto len = meta["len"].get<float>();
   auto dir = meta["dir"];
@@ -181,10 +193,4 @@ void DebugGUI::DrawLineControls(Entity *entity) {
     meta["dir"] = {{"x", dirVec.x}, {"y", dirVec.y}, {"z", dirVec.z}};
     entity->SetMetadata(meta);
   }
-}
-
-void DebugGUI::DrawSplineControls(Entity *entity) {
-  auto meta = entity->GetMetadata();
-
-  // TODO: implement spline controls
 }

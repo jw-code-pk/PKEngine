@@ -1,13 +1,10 @@
-#include "DebugLevel.h"
-#include "Core/Curves/Arc.h"
-#include "Core/Curves/Line.h"
-#include "Core/Curves/Spline.h"
+#include "EditorLevel.h"
+#include "EditorGUI.h"
+
+#include "Core/EntityFactory.h"
 #include "Core/GEngine.h"
 #include "Core/ResourceLoader.h"
 #include "Core/World.h"
-#include "Cube.h"
-#include "Debug/DebugGUI.h"
-#include "Ninja.h"
 
 #include <OgreMath.h>
 #include <OgreMatrix3.h>
@@ -24,8 +21,7 @@
 
 using json = nlohmann::json;
 
-void DebugLevel::Init() {
-
+void EditorLevel::Init() {
   // Scene setup
   auto world = GEngine::Get<World>();
   auto sceneManager = world->GetSceneManager();
@@ -61,7 +57,7 @@ void DebugLevel::Init() {
   GEngine::Register(m_CurveGroup);
 
   // Editor bits
-  m_GUI = new DebugGUI(this);
+  m_GUI = new EditorGUI(this);
   world->AddGUI(m_GUI);
 
   m_CurrentIndex = -1;
@@ -71,20 +67,20 @@ void DebugLevel::Init() {
   DisplayTestImage();
 }
 
-void DebugLevel::Cleanup() { delete m_CurveGroup; }
+void EditorLevel::Cleanup() { delete m_CurveGroup; }
 
-void DebugLevel::BeginPlay() { Level::BeginPlay(); }
+void EditorLevel::BeginPlay() { Level::BeginPlay(); }
 
-void DebugLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }
+void EditorLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }
 
-void DebugLevel::EndPlay() {
+void EditorLevel::EndPlay() {
   Level::EndPlay();
 
   auto world = GEngine::Get<World>();
   world->SetActiveCamera("EditorCam");
 }
 
-void DebugLevel::SelectNextEntity() {
+void EditorLevel::SelectNextEntity() {
   const auto num = m_Entities.size();
 
   if (num <= 0) {
@@ -99,7 +95,7 @@ void DebugLevel::SelectNextEntity() {
   m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
 }
 
-void DebugLevel::SelectPrevEntity() {
+void EditorLevel::SelectPrevEntity() {
   const auto num = m_Entities.size();
 
   if (num <= 0) {
@@ -119,7 +115,7 @@ void DebugLevel::SelectPrevEntity() {
   m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
 }
 
-Ogre::Vector3 DebugLevel::GetEntityPosition() {
+Ogre::Vector3 EditorLevel::GetEntityPosition() {
   if (m_CurrentIndex < 0) {
     return Ogre::Vector3::ZERO;
   }
@@ -127,7 +123,7 @@ Ogre::Vector3 DebugLevel::GetEntityPosition() {
   return m_Entities[m_CurrentIndex]->GetRoot()->getPosition();
 }
 
-void DebugLevel::SetEntityPosition(const Ogre::Vector3 &Position) {
+void EditorLevel::SetEntityPosition(const Ogre::Vector3 &Position) {
   if (m_CurrentIndex < 0) {
     return;
   }
@@ -135,7 +131,7 @@ void DebugLevel::SetEntityPosition(const Ogre::Vector3 &Position) {
   m_Entities[m_CurrentIndex]->GetRoot()->setPosition(Position);
 }
 
-Ogre::Vector3 DebugLevel::GetEntityRotation() {
+Ogre::Vector3 EditorLevel::GetEntityRotation() {
   if (m_CurrentIndex < 0) {
     return Ogre::Vector3::ZERO;
   }
@@ -153,7 +149,7 @@ Ogre::Vector3 DebugLevel::GetEntityRotation() {
                        roll.valueDegrees());
 }
 
-void DebugLevel::SetEntityRotation(const Ogre::Vector3 &Rotation) {
+void EditorLevel::SetEntityRotation(const Ogre::Vector3 &Rotation) {
   if (m_CurrentIndex < 0) {
     return;
   }
@@ -168,7 +164,7 @@ void DebugLevel::SetEntityRotation(const Ogre::Vector3 &Rotation) {
   m_Entities[m_CurrentIndex]->GetRoot()->setOrientation(rotMat);
 }
 
-Ogre::String DebugLevel::GetEntityTypeId() {
+Ogre::String EditorLevel::GetEntityTypeId() {
   if (m_CurrentIndex < 0) {
     return Ogre::String();
   }
@@ -176,7 +172,7 @@ Ogre::String DebugLevel::GetEntityTypeId() {
   return m_Entities[m_CurrentIndex]->GetTypeId();
 }
 
-bool DebugLevel::TryGetEntity(Entity *&OutEntity) {
+bool EditorLevel::TryGetEntity(Entity *&OutEntity) {
   if (m_CurrentIndex < 0) {
     OutEntity = nullptr;
     return false;
@@ -186,7 +182,7 @@ bool DebugLevel::TryGetEntity(Entity *&OutEntity) {
   return true;
 }
 
-void DebugLevel::CameraToEntity() {
+void EditorLevel::CameraToEntity() {
   if (m_CurrentIndex < 0) {
     return;
   }
@@ -198,7 +194,7 @@ void DebugLevel::CameraToEntity() {
   m_Camera->lookAt(entityPos, Ogre::Node::TS_WORLD);
 }
 
-void DebugLevel::SaveLevel(const Ogre::String &Name) {
+void EditorLevel::SaveLevel(const Ogre::String &Name) {
   json levelData;
   levelData["entities"] = json::array();
 
@@ -232,7 +228,7 @@ void DebugLevel::SaveLevel(const Ogre::String &Name) {
   }
 }
 
-void DebugLevel::LoadLevel(const Ogre::String &Name) {
+void EditorLevel::LoadLevel(const Ogre::String &Name) {
   std::ifstream file(Name);
   if (!file.is_open()) {
     return;
@@ -265,24 +261,29 @@ void DebugLevel::LoadLevel(const Ogre::String &Name) {
   }
 }
 
-void DebugLevel::CreateEntity(const Ogre::String &TypeId,
-                              const Ogre::Vector3 &Position) {
+std::vector<Ogre::String> EditorLevel::GetAvailableEntities() {
+  auto entityFactory = GEngine::Get<EntityFactory>();
+  return entityFactory->GetAvailableEntities();
+}
+
+void EditorLevel::CreateEntity(const Ogre::String &TypeId,
+                               const Ogre::Vector3 &Position) {
   auto entity = SpawnFromTypeId(TypeId);
 
   if (entity) {
     entity->GetRoot()->setPosition(Position);
+
+    if (m_CurrentIndex >= 0) {
+      m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
+    }
+
+    m_CurrentIndex = m_Entities.size() - 1;
+
+    entity->GetRoot()->showBoundingBox(true);
   }
-
-  if (m_CurrentIndex >= 0) {
-    m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
-  }
-
-  m_CurrentIndex = m_Entities.size() - 1;
-
-  entity->GetRoot()->showBoundingBox(true);
 }
 
-void DebugLevel::DeleteEntity() {
+void EditorLevel::DeleteEntity() {
   if (m_CurrentIndex >= 0) {
     m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
   }
@@ -304,21 +305,9 @@ void DebugLevel::DeleteEntity() {
   }
 }
 
-Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
-  auto world = GEngine::Get<World>();
-  Entity *result = nullptr;
-
-  if (TypeId == "Ninja") {
-    result = world->CreateEntity<Ninja>();
-  } else if (TypeId == "Arc") {
-    result = world->CreateEntity<Arc>();
-  } else if (TypeId == "Spline") {
-    result = world->CreateEntity<Spline>();
-  } else if (TypeId == "Line") {
-    result = world->CreateEntity<Line>();
-  } else if (TypeId == "Cube") {
-    result = world->CreateEntity<Cube>();
-  }
+Entity *EditorLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
+  auto entityFactory = GEngine::Get<EntityFactory>();
+  Entity *result = entityFactory->Spawn(TypeId);
 
   if (result) {
     result->Init();
@@ -337,7 +326,7 @@ Entity *DebugLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
   return result;
 }
 
-void DebugLevel::DisplayTestImage() {
+void EditorLevel::DisplayTestImage() {
   // Load resources
   auto resourceLoader = GEngine::Get<ResourceLoader>();
   resourceLoader->CreateUIMaterial("UIShared", "UIImageMaterial", "test.png");

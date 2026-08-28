@@ -6,7 +6,7 @@
 #include "Core/Level.h"
 #include <OgrePrerequisites.h>
 
-class DebugLevel : public Level {
+class EditorLevel : public Level {
 public:
   virtual void Init() override;
   virtual void Cleanup() override;
@@ -32,6 +32,7 @@ public:
   void SaveLevel(const Ogre::String &Name);
   void LoadLevel(const Ogre::String &Name);
 
+  std::vector<Ogre::String> GetAvailableEntities();
   void CreateEntity(const Ogre::String &TypeId,
                     const Ogre::Vector3 &Position = Ogre::Vector3::ZERO);
   void DeleteEntity();

@@ -33,9 +33,7 @@ public:
       return static_cast<T *>(iter->second);
     }
 
-    assert(
-        std::format("Resource of type {} is not available.", typeid(T).name())
-            .c_str());
+    assert(false && "Resource not available.");
 
     return nullptr;
   }

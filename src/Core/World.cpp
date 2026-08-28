@@ -1,9 +1,6 @@
-
 #include "World.h"
+#include "Editor/EditorLevel.h"
 #include "GEngine.h"
-
-// TODO: cleanup
-#include "Debug/DebugLevel.h"
 
 World::World(Ogre::SceneManager *SceneManager,
              Ogre::RenderWindow *RenderWindow) {
@@ -26,7 +23,7 @@ World::~World() {
 }
 
 void World::LoadLevel() {
-  m_ActiveLevel = new DebugLevel();
+  m_ActiveLevel = new EditorLevel();
   m_ActiveLevel->Init();
 }
 

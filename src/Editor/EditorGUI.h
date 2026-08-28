@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Core/GUI.h"
-#include "Debug/DebugLevel.h"
+#include "EditorLevel.h"
 #include <OgrePrerequisites.h>
 
-class DebugGUI : public GUI {
+class EditorGUI : public GUI {
 public:
-  DebugGUI(DebugLevel *Level);
+  EditorGUI(EditorLevel *Level);
   virtual void Tick(const float &DeltaTime) override;
 
 protected:
@@ -18,6 +18,6 @@ protected:
   void DrawSplineControls(Entity *entity);
 
 private:
-  DebugLevel *m_Level;
+  EditorLevel *m_Level;
   int m_EntityTypeSelectIndex;
 };
