@@ -22,8 +22,8 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
   assert(m_Curves.size() > 0 && "There are no curves registered.");
 
   Curve *closestCurve = nullptr;
-  auto stepSize = 10;
-  auto closestPoint = Ogre::Vector3::UNIT_SCALE * stepSize * 2;
+  auto stepSize = 10.0f;
+  auto closestPoint = Position + Ogre::Vector3::UNIT_SCALE * 100;
   auto closestDistance = 0.0f;
 
   for (const auto &kvp : m_Curves) {

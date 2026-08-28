@@ -27,6 +27,8 @@ void CurveFollower::Tick(const float &DeltaTime) {
         m_Forward *= -1;
       }
     }
+  } else {
+    updatedPos += m_Forward * m_Speed * DeltaTime;
   }
 
   GetRoot()->setPosition(updatedPos);
