@@ -21,9 +21,22 @@ public:
   void FaceDirection(const Ogre::Vector3 &Direction);
   NinjaSM *GetStateMachine() { return m_StateMachine; }
 
+  bool IsGrounded() { return m_IsGrounded; }
+  void Launch(const float &Speed);
+
+protected:
+  void TickPhysics(const float &DeltaTime);
+
 private:
   float m_Rotation;
+
+  float m_GroundDistance;
+  float m_VerticalSpeed;
+  bool m_IsGrounded;
+
   Ogre::SceneNode *m_PawnNode;
+  Ogre::SceneNode *m_ModelNode;
+
   Ogre::AnimationState *m_ActiveAnim;
   Ogre::AnimationStateSet *m_AnimSet;
 

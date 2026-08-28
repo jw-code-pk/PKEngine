@@ -20,7 +20,10 @@ public:
 
   bool HasCurve() { return m_Curve != nullptr; }
   void Follow(Curve *Curve, const float &StartDistance = 0);
-  void FollowClosest(const Ogre::Vector3 &Position, CurveGroup *Group);
+  void FollowClosest(const Ogre::Vector3 &Position, CurveGroup *Group,
+                     const bool &bIgnoreCurrent = false);
+  void FollowClosestBelow(const Ogre::Vector3 &Position, CurveGroup *Group,
+                          const bool &bIgnoreCurrent = false);
 
   void SetSpeed(const float &Speed) { m_Speed = Speed; }
 

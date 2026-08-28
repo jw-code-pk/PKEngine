@@ -1,5 +1,6 @@
 #include "Ninja.h"
 #include "NinjaSM/States/NinjaIdleState.h"
+#include "NinjaSM/States/NinjaJumpState.h"
 #include "NinjaSM/States/NinjaWalkState.h"
 
 #include "Core/GEngine.h"
@@ -9,6 +10,7 @@
 
 Ninja::Ninja(Ogre::SceneNode *Root) : CurveFollower(Root) {
   m_CanTick = true;
+  m_IsGrounded = true;
   m_StateMachine = new NinjaSM(this);
 }
 
@@ -23,14 +25,16 @@ bool Ninja::Init() {
 
   GetRoot()->setPosition(0, 0, 0);
 
-  Ogre::Entity *ninjaMesh = sceneManager->createEntity("ninja.mesh");
   m_PawnNode = GetRoot()->createChildSceneNode();
-  m_PawnNode->attachObject(ninjaMesh);
+
+  Ogre::Entity *ninjaMesh = sceneManager->createEntity("ninja.mesh");
+  m_ModelNode = m_PawnNode->createChildSceneNode();
+  m_ModelNode->attachObject(ninjaMesh);
   m_AnimSet = ninjaMesh->getAllAnimationStates();
-  m_PawnNode->setPosition(Ogre::Vector3::ZERO);
+  m_ModelNode->setPosition(Ogre::Vector3::ZERO);
 
   Ogre::Camera *cam = world->CreateCamera("NinjaCam");
-  auto camNode = GetRoot()->createChildSceneNode();
+  auto camNode = m_PawnNode->createChildSceneNode();
   camNode->attachObject(cam);
   camNode->setPosition(0, 500, 1250);
 
@@ -50,6 +54,7 @@ bool Ninja::Init() {
   // Setup behaviour states
   m_StateMachine->Register(new NinjaWalkState());
   m_StateMachine->Register(new NinjaIdleState());
+  m_StateMachine->Register(new NinjaJumpState());
 
   return true;
 }
@@ -65,7 +70,7 @@ void Ninja::Tick(const float &DeltaTime) {
   assert(m_PawnNode && "Pawn node should be initialised.");
   m_StateMachine->Tick(DeltaTime);
 
-  CurveFollower::Tick(DeltaTime);
+  TickPhysics(DeltaTime);
 
   GetRoot()->setOrientation(CurveFollower::CalculateOrientation());
   m_ActiveAnim->addTime(DeltaTime * 3);
@@ -93,5 +98,54 @@ void Ninja::ChangeAnim(const Ogre::String &Name) {
 }
 
 void Ninja::FaceDirection(const Ogre::Vector3 &Direction) {
-  m_PawnNode->setDirection(Direction);
+  m_ModelNode->setDirection(Direction);
+}
+
+void Ninja::Launch(const float &Speed) {
+  if (!m_IsGrounded) {
+    return;
+  }
+
+  m_VerticalSpeed = Speed;
+  m_IsGrounded = false;
+}
+
+void Ninja::TickPhysics(const float &DeltaTime) {
+  CurveFollower::Tick(DeltaTime);
+
+  auto curveGroup = GEngine::Get<CurveGroup>();
+
+  if (m_IsGrounded) {
+    if (IsCoyote()) {
+      FollowClosest(GetRoot()->getPosition(), curveGroup, true);
+
+      if (IsCoyote()) {
+        m_IsGrounded = false;
+      }
+    }
+  }
+
+  if (!m_IsGrounded) {
+    const auto worldPosition =
+        GetRoot()->getPosition() + m_PawnNode->getPosition();
+    const auto prevFollowPos = GetRoot()->getPosition();
+    FollowClosestBelow(worldPosition, curveGroup, false);
+    const auto nextFollowPos = GetRoot()->getPosition();
+    m_GroundDistance += nextFollowPos.y - prevFollowPos.y;
+
+    const auto gravity = 900;
+    m_GroundDistance += m_VerticalSpeed * DeltaTime;
+
+    if (m_GroundDistance <= 0) {
+      m_IsGrounded = true;
+      m_VerticalSpeed = 0;
+      m_GroundDistance = 0;
+      m_PawnNode->setPosition(Ogre::Vector3::ZERO);
+    } else {
+      m_VerticalSpeed -= gravity * DeltaTime;
+      auto updatedPos = m_PawnNode->getPosition();
+      updatedPos.y = m_GroundDistance;
+      m_PawnNode->setPosition(updatedPos);
+    }
+  }
 }

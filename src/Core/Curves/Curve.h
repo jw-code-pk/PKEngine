@@ -4,6 +4,8 @@
 
 class Curve : public Entity {
 public:
+  static const int NoneID = -1;
+
   struct QueryResult {
     float Distance;
     Ogre::Vector3 Point;
@@ -20,6 +22,9 @@ public:
 
   QueryResult FindClosestPoint(const Ogre::Vector3 &Position,
                                const float &Step = 1.0f);
+
+  QueryResult FindClosestPointIgnoreY(const Ogre::Vector3 &Position,
+                                      const float &Step = 1.0f);
 
 private:
   int m_CurveID;
