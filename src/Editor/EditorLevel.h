@@ -28,6 +28,8 @@ public:
   bool TryGetEntity(Entity *&OutEntity);
 
   void CameraToEntity();
+  void SetCameraDistance(const float &Distance);
+  void SetCameraDirection(const Ogre::Vector3 &Direction);
 
   void SaveLevel(const Ogre::String &Name);
   void LoadLevel(const Ogre::String &Name);
@@ -44,6 +46,9 @@ protected:
 
 private:
   Ogre::SceneNode *m_Camera;
+  Ogre::Vector3 m_CameraDirection;
+  float m_CameraDistance;
+
   CurveGroup *m_CurveGroup;
 
   int m_CurrentIndex;

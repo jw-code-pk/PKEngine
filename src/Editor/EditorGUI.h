@@ -19,5 +19,9 @@ protected:
 
 private:
   EditorLevel *m_Level;
+
+  Ogre::Vector3 m_CameraDirection;
+  float m_CameraDistance;
+
   int m_EntityTypeSelectIndex;
 };

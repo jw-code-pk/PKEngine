@@ -51,6 +51,8 @@ void EditorLevel::Init() {
   cam->setNearClipDistance(5);
   m_Camera->attachObject(cam);
   m_Camera->setPosition(0, 0, 1500);
+  m_CameraDistance = 1500;
+  m_CameraDirection = Ogre::Vector3::UNIT_Z;
 
   // Gameplay bits
   m_CurveGroup = new CurveGroup();
@@ -192,10 +194,32 @@ void EditorLevel::CameraToEntity() {
   }
 
   auto entityPos = m_Entities[m_CurrentIndex]->GetRoot()->getPosition();
-  auto origin = entityPos + Ogre::Vector3(0, 750, 1500);
-
+  auto cameraOffset =
+      Ogre::Vector3(m_CameraDirection.x, 1, m_CameraDirection.z) *
+      m_CameraDistance;
+  auto origin = entityPos + cameraOffset;
   m_Camera->setPosition(origin);
-  m_Camera->lookAt(entityPos, Ogre::Node::TS_WORLD);
+
+  auto cameraAim = -m_CameraDirection;
+  m_Camera->setOrientation(Ogre::Quaternion::IDENTITY);
+  m_Camera->setDirection(cameraAim, Ogre::Node::TS_WORLD);
+
+  m_Camera->pitch(Ogre::Radian(-0.5f * Ogre::Math::HALF_PI),
+                  Ogre::Node::TS_LOCAL);
+}
+
+void EditorLevel::SetCameraDistance(const float &Distance) {
+  assert(Distance > 0 && "Camera distance can't be negative");
+  m_CameraDistance = Distance;
+
+  CameraToEntity();
+}
+
+void EditorLevel::SetCameraDirection(const Ogre::Vector3 &Direction) {
+  assert(Direction.squaredLength() > 0 && "Camera direction is not valid.");
+  m_CameraDirection = Direction.normalisedCopy();
+
+  CameraToEntity();
 }
 
 void EditorLevel::SaveLevel(const Ogre::String &Name) {

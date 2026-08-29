@@ -8,6 +8,9 @@ const int PANEL_GAP = 8;
 EditorGUI::EditorGUI(EditorLevel *Level) {
   m_Level = Level;
   m_EntityTypeSelectIndex = -1;
+
+  m_CameraDirection = Ogre::Vector3::UNIT_Z;
+  m_CameraDistance = 1500;
 }
 
 void EditorGUI::Tick(const float &DeltaTime) {
@@ -109,8 +112,24 @@ void EditorGUI::DrawLeftPanel() {
   // Camera operations
   ImGui::SeparatorText("Camera");
 
-  if (ImGui::Button("Snap Camera")) {
-    m_Level->CameraToEntity();
+  if (ImGui::Button("Front")) {
+    m_Level->SetCameraDirection(Ogre::Vector3::UNIT_Z);
+  }
+
+  ImGui::SameLine();
+
+  if (ImGui::Button("Back")) {
+    m_Level->SetCameraDirection(-Ogre::Vector3::UNIT_Z);
+  }
+
+  if (ImGui::Button("Left")) {
+    m_Level->SetCameraDirection(Ogre::Vector3::UNIT_X);
+  }
+
+  ImGui::SameLine();
+
+  if (ImGui::Button("Right")) {
+    m_Level->SetCameraDirection(-Ogre::Vector3::UNIT_X);
   }
 
   // Level operations
