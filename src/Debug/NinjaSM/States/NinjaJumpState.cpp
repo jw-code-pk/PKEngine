@@ -8,7 +8,7 @@
 
 void NinjaJumpState::Enter(Ninja *Target) {
   Target->ChangeAnim("Idle1");
-  Target->Launch(300);
+  Target->Launch(1800);
 }
 
 void NinjaJumpState::Tick(Ninja *Target, const float &DeltaTime) {

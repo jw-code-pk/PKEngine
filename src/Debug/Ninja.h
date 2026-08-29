@@ -26,6 +26,8 @@ public:
 
 protected:
   void TickPhysics(const float &DeltaTime);
+  void TickGroundMovement(const float &DeltaTime);
+  void TickInAirMovement(const float &DeltaTime);
 
 private:
   float m_Rotation;

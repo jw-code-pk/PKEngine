@@ -63,6 +63,9 @@ void Ninja::BeginPlay() {
   auto world = GEngine::Get<World>();
   world->SetActiveCamera("NinjaCam");
 
+  auto curveGroup = GEngine::Get<CurveGroup>();
+  FollowClosest(GetRoot()->getPosition(), curveGroup);
+
   m_StateMachine->ChangeState<NinjaIdleState>();
 }
 
@@ -111,41 +114,54 @@ void Ninja::Launch(const float &Speed) {
 }
 
 void Ninja::TickPhysics(const float &DeltaTime) {
-  CurveFollower::Tick(DeltaTime);
-
-  auto curveGroup = GEngine::Get<CurveGroup>();
-
   if (m_IsGrounded) {
-    if (IsCoyote()) {
-      FollowClosest(GetRoot()->getPosition(), curveGroup, true);
-
-      if (IsCoyote()) {
-        m_IsGrounded = false;
-      }
-    }
+    TickGroundMovement(DeltaTime);
   }
 
   if (!m_IsGrounded) {
-    const auto worldPosition =
-        GetRoot()->getPosition() + m_PawnNode->getPosition();
-    const auto prevFollowPos = GetRoot()->getPosition();
-    FollowClosestBelow(worldPosition, curveGroup, false);
-    const auto nextFollowPos = GetRoot()->getPosition();
-    m_GroundDistance += nextFollowPos.y - prevFollowPos.y;
+    TickInAirMovement(DeltaTime);
+  }
 
-    const auto gravity = 900;
-    m_GroundDistance += m_VerticalSpeed * DeltaTime;
+  CurveFollower::Tick(DeltaTime);
+}
 
-    if (m_GroundDistance <= 0) {
-      m_IsGrounded = true;
-      m_VerticalSpeed = 0;
-      m_GroundDistance = 0;
-      m_PawnNode->setPosition(Ogre::Vector3::ZERO);
-    } else {
-      m_VerticalSpeed -= gravity * DeltaTime;
-      auto updatedPos = m_PawnNode->getPosition();
-      updatedPos.y = m_GroundDistance;
-      m_PawnNode->setPosition(updatedPos);
-    }
+void Ninja::TickGroundMovement(const float &DeltaTime) {
+  auto curveGroup = GEngine::Get<CurveGroup>();
+
+  // Should we change to a connected curve?
+  if (IsCoyote()) {
+    FollowClosest(GetRoot()->getPosition(), curveGroup, true);
+  }
+
+  // There is no connected curve - should we need to fall
+  if (IsCoyote()) {
+    m_IsGrounded = false;
+  }
+}
+
+void Ninja::TickInAirMovement(const float &DeltaTime) {
+  auto curveGroup = GEngine::Get<CurveGroup>();
+
+  const auto prevFollowPos = GetRoot()->getPosition();
+  const auto worldPosition = prevFollowPos + m_PawnNode->getPosition();
+  FollowClosestBelow(worldPosition, curveGroup, IsCoyote());
+  const auto nextFollowPos = GetRoot()->getPosition();
+  m_GroundDistance += prevFollowPos.y - nextFollowPos.y;
+
+  const auto gravity = 7000;
+  m_GroundDistance += m_VerticalSpeed * DeltaTime;
+
+  if (m_GroundDistance <= 0) {
+    // Land
+    m_IsGrounded = true;
+    m_VerticalSpeed = 0;
+    m_GroundDistance = 0;
+    m_PawnNode->setPosition(Ogre::Vector3::ZERO);
+  } else {
+    // Update vertical movement
+    m_VerticalSpeed -= gravity * DeltaTime;
+    auto updatedPos = m_PawnNode->getPosition();
+    updatedPos.y = m_GroundDistance;
+    m_PawnNode->setPosition(updatedPos);
   }
 }

@@ -79,7 +79,7 @@ Curve::QueryResult Curve::FindClosestPointIgnoreY(const Ogre::Vector3 &Position,
   auto closestDistance = 0.0f;
   auto closestPoint = Evaluate(closestDistance);
 
-  for (int i = 1; i < numSamples; i++) {
+  for (int i = 1; i <= numSamples; i++) {
     const auto k = i * Step;
     const auto p = Evaluate(k);
 

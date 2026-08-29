@@ -93,6 +93,8 @@ void EditorLevel::SelectNextEntity() {
 
   m_CurrentIndex = (m_CurrentIndex + 1) % num;
   m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
+
+  CameraToEntity();
 }
 
 void EditorLevel::SelectPrevEntity() {
@@ -113,6 +115,8 @@ void EditorLevel::SelectPrevEntity() {
   }
 
   m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
+
+  CameraToEntity();
 }
 
 Ogre::Vector3 EditorLevel::GetEntityPosition() {

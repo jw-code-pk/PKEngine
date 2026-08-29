@@ -14,6 +14,15 @@ public:
     return !HasCurve() || m_Distance < 0 || m_Distance > m_Curve->GetLength();
   }
 
+  inline bool CalculateCoyoteDistance() {
+    if (HasCurve()) {
+      return m_Distance < 0 ? -1 * m_Distance
+                            : m_Distance - m_Curve->GetLength();
+    } else {
+      return 0;
+    }
+  }
+
   inline int CurrentCurveId() {
     return HasCurve() ? m_Curve->GetCurveId() : -1;
   }
