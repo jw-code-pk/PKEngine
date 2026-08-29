@@ -29,12 +29,15 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
       Position + Ogre::Vector3::UNIT_SCALE * std::numeric_limits<float>::max();
   auto closestDistance = 0.0f;
 
-  for (const auto &kvp : m_Curves) {
-    if (kvp.first == IgnoreId) {
+  std::set<Curve *> curveResults;
+  m_CurveTree->FetchAll(Position, Ogre::Vector3(1000, 1000, 1000),
+                        curveResults);
+
+  for (const auto c : curveResults) {
+    if (c->GetCurveId() == IgnoreId) {
       continue;
     }
 
-    auto c = kvp.second;
     auto p = c->FindClosestPoint(Position, STEP_SIZE);
 
     if (Position.squaredDistance(p.Point) > STEP_SIZE_SQ) {
@@ -66,12 +69,15 @@ CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position,
 
   auto closestDistance = 0.0f;
 
-  for (const auto &kvp : m_Curves) {
-    if (kvp.first == IgnoreId) {
+  std::set<Curve *> curveResults;
+  m_CurveTree->FetchAll(Position, Ogre::Vector3(2000, 2000, 2000),
+                        curveResults);
+
+  for (const auto c : curveResults) {
+    if (c->GetCurveId() == IgnoreId) {
       continue;
     }
 
-    auto c = kvp.second;
     auto p0 = c->Evaluate(0);
 
     // ignore curves above our position
@@ -106,4 +112,23 @@ CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position,
 
   return CurveGroup::QueryResult{.Curve = closestCurve,
                                  .Distance = closestDistance};
+}
+
+void CurveGroup::RefreshTree() {
+  if (m_CurveTree != nullptr) {
+    m_CurveTree->ClearAll();
+    delete m_CurveTree;
+  }
+
+  m_CurveTree = new Octree<Curve *>(Ogre::Vector3::ZERO,
+                                    Ogre::Vector3(20000, 20000, 20000));
+
+  for (auto kvp : m_Curves) {
+    auto curve = kvp.second;
+    auto startPoint = curve->Evaluate(0);
+    auto endPoint = curve->Evaluate(curve->GetLength());
+
+    m_CurveTree->TryAdd(startPoint, curve);
+    m_CurveTree->TryAdd(endPoint, curve);
+  }
 }

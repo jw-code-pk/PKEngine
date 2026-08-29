@@ -65,7 +65,11 @@ void EditorLevel::Init() {
 
 void EditorLevel::Cleanup() { delete m_CurveGroup; }
 
-void EditorLevel::BeginPlay() { Level::BeginPlay(); }
+void EditorLevel::BeginPlay() {
+  m_CurveGroup->RefreshTree();
+
+  Level::BeginPlay();
+}
 
 void EditorLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }
 

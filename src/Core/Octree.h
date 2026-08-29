@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Core/GEngine.h"
 #include <Ogre.h>
 
 template <typename T> class Octree {
 public:
   struct OctreeNode {
-    const T *Data;
+    const T Data;
     const Ogre::Vector3 Origin;
   };
 
@@ -22,6 +23,11 @@ public:
         delete m_Children[i];
       }
     }
+  }
+
+  bool TryAdd(const Ogre::Vector3 &Origin, T Data) {
+    auto node = OctreeNode{.Data = Data, .Origin = Origin};
+    return TryAdd(node);
   }
 
   bool TryAdd(const OctreeNode &Node) {
@@ -41,29 +47,40 @@ public:
     return true;
   }
 
+  void ClearAll() {
+    m_Data.clear();
+    for (auto child : m_Children) {
+      child->ClearAll();
+    }
+  }
+
   void FetchAll(const Ogre::Vector3 &Point, const Ogre::Vector3 &Extents,
-                std::vector<OctreeNode> &Results) const {
+                std::set<T> &Results) const {
     if (!HasOverlap(Point, Extents)) {
       return;
     }
 
     if (m_HasSplit) {
-      for (const auto child : m_Children) {
-        child->FetchAll(Results);
+      for (auto child : m_Children) {
+        child->FetchAll(Point, Extents, Results);
       }
     } else if (m_Data.size() > 0) {
-      Results.insert(Results.end(), m_Data.begin(), m_Data.end());
+      // Results.insert(Results.end(), m_Data.begin(), m_Data.end());
+      for (auto node : m_Data) {
+        Results.insert(node.Data);
+      }
     }
   }
 
 protected:
-  bool HasOverlap(const Ogre::Vector3 &Point) {
+  bool HasOverlap(const Ogre::Vector3 &Point) const {
     return std::abs(Point.x - m_Origin.x) <= m_Extents.x &&
            std::abs(Point.y - m_Origin.y) <= m_Extents.y &&
            std::abs(Point.z - m_Origin.z) <= m_Extents.z;
   }
 
-  bool HasOverlap(const Ogre::Vector3 &Point, const Ogre::Vector3 &Extents) {
+  bool HasOverlap(const Ogre::Vector3 &Point,
+                  const Ogre::Vector3 &Extents) const {
     return std::abs(Point.x - m_Origin.x) <= (Extents.x + m_Extents.x) &&
            std::abs(Point.y - m_Origin.y) <= (Extents.y + m_Extents.y) &&
            std::abs(Point.z - m_Origin.z) <= (Extents.z + m_Extents.z);
@@ -98,7 +115,7 @@ protected:
                                             -halfExtents.z),
                    halfExtents, m_MaxNodeCount);
 
-    for (const auto &node : m_Data) {
+    for (auto &node : m_Data) {
       AddToChildren(node);
     }
 
@@ -108,7 +125,7 @@ protected:
 
   void AddToChildren(const OctreeNode &Node) {
     for (auto child : m_Children) {
-      if (child.TryAdd(Node)) {
+      if (child->TryAdd(Node)) {
         return;
       }
     }
