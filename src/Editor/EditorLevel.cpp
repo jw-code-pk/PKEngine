@@ -38,12 +38,6 @@ void EditorLevel::Init() {
       groundEntity);
   groundEntity->setMaterialName("Examples/GrassFloor");
 
-  Ogre::Light *light = sceneManager->createLight("MainLight");
-  Ogre::SceneNode *lightNode =
-      sceneManager->getRootSceneNode()->createChildSceneNode();
-  lightNode->attachObject(light);
-  lightNode->setPosition(120, 180, 150);
-
   m_Camera = sceneManager->getRootSceneNode()->createChildSceneNode();
   Ogre::Camera *cam = world->CreateCamera("EditorCam");
   world->SetActiveCamera("EditorCam");

@@ -27,12 +27,14 @@ bool Ninja::Init() {
 
   m_PawnNode = GetRoot()->createChildSceneNode();
 
+  // model setup
   Ogre::Entity *ninjaMesh = sceneManager->createEntity("ninja.mesh");
   m_ModelNode = m_PawnNode->createChildSceneNode();
   m_ModelNode->attachObject(ninjaMesh);
   m_AnimSet = ninjaMesh->getAllAnimationStates();
   m_ModelNode->setPosition(Ogre::Vector3::ZERO);
 
+  // camera setup
   Ogre::Camera *cam = world->CreateCamera("NinjaCam");
   auto camNode = m_PawnNode->createChildSceneNode();
   camNode->attachObject(cam);
