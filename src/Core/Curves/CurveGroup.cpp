@@ -21,7 +21,8 @@ void CurveGroup::Unregister(Curve *Curve) {
 }
 
 CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
-                                                const int IgnoreId) const {
+                                                const int &IgnoreId,
+                                                const float &Range) const {
   assert(m_Curves.size() > 0 && "There are no curves registered.");
 
   Curve *closestCurve = nullptr;
@@ -30,7 +31,7 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
   auto closestDistance = 0.0f;
 
   std::set<Curve *> curveResults;
-  m_CurveTree->FetchAll(Position, Ogre::Vector3(1000, 1000, 1000),
+  m_CurveTree->FetchAll(Position, Ogre::Vector3(Range, Range, Range),
                         curveResults);
 
   for (const auto c : curveResults) {
@@ -59,8 +60,8 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
 }
 
 CurveGroup::QueryResult
-CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position,
-                             const int IgnoreId) const {
+CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position, const int &IgnoreId,
+                             const float &Range) const {
   assert(m_Curves.size() > 0 && "There are no curves registered.");
 
   Curve *closestCurve = nullptr;
@@ -70,7 +71,7 @@ CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position,
   auto closestDistance = 0.0f;
 
   std::set<Curve *> curveResults;
-  m_CurveTree->FetchAll(Position, Ogre::Vector3(2000, 2000, 2000),
+  m_CurveTree->FetchAll(Position, Ogre::Vector3(Range, Range, Range),
                         curveResults);
 
   for (const auto c : curveResults) {

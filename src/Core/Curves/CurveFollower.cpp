@@ -47,12 +47,12 @@ void CurveFollower::Follow(Curve *Curve, const float &StartDistance) {
 }
 
 void CurveFollower::FollowClosest(const Ogre::Vector3 &Position,
-                                  CurveGroup *Group,
-                                  const bool &bIgnoreCurrent) {
+                                  CurveGroup *Group, const bool &bIgnoreCurrent,
+                                  const float &Range) {
 
   auto ignoreId = bIgnoreCurrent ? CurrentCurveId() : Curve::NoneID;
 
-  auto queryResult = Group->FindClosest(Position, ignoreId);
+  auto queryResult = Group->FindClosest(Position, ignoreId, Range);
   if (queryResult.IsValid()) {
     Follow(queryResult.Curve, queryResult.Distance);
   }
@@ -60,9 +60,10 @@ void CurveFollower::FollowClosest(const Ogre::Vector3 &Position,
 
 void CurveFollower::FollowClosestBelow(const Ogre::Vector3 &Position,
                                        CurveGroup *Group,
-                                       const bool &bIgnoreCurrent) {
+                                       const bool &bIgnoreCurrent,
+                                       const float &Range) {
   auto ignoreId = bIgnoreCurrent ? CurrentCurveId() : Curve::NoneID;
-  auto queryResult = Group->FindClosestBelow(Position, ignoreId);
+  auto queryResult = Group->FindClosestBelow(Position, ignoreId, Range);
   if (queryResult.IsValid()) {
     Follow(queryResult.Curve, queryResult.Distance);
   }

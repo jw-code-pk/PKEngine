@@ -16,12 +16,16 @@ public:
   void Unregister(Curve *Curve);
 
   QueryResult FindClosest(const Ogre::Vector3 &Position,
-                          const int IgnoreId = Curve::NoneID) const;
+                          const int &IgnoreId = Curve::NoneID,
+                          const float &Range = 1000) const;
 
   QueryResult FindClosestBelow(const Ogre::Vector3 &Position,
-                               const int IgnoreId = Curve::NoneID) const;
+                               const int &IgnoreId = Curve::NoneID,
+                               const float &Range = 1000) const;
 
   void RefreshTree();
+
+  Octree<Curve *> *GetTree() { return m_CurveTree; }
 
 private:
   std::unordered_map<int, Curve *> m_Curves;

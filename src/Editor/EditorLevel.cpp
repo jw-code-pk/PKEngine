@@ -19,6 +19,8 @@
 
 #include <cassert>
 
+#include "Debug/OctreeDebug.h"
+
 using json = nlohmann::json;
 
 void EditorLevel::Init() {
@@ -69,6 +71,12 @@ void EditorLevel::BeginPlay() {
   m_CurveGroup->RefreshTree();
 
   Level::BeginPlay();
+
+  auto world = GEngine::Get<World>();
+  auto sceneManager = world->GetSceneManager();
+  auto root = sceneManager->getRootSceneNode();
+
+  OctreeDebug<Curve *>::ShowGizmos(root, m_CurveGroup->GetTree());
 }
 
 void EditorLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }

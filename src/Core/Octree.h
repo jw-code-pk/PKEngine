@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/GEngine.h"
 #include <Ogre.h>
 
 template <typename T> class Octree {
@@ -70,6 +69,22 @@ public:
         Results.insert(node.Data);
       }
     }
+  }
+
+  void GetChildren(std::vector<Octree<T> *> &Results) {
+    if (!m_HasSplit) {
+      return;
+    }
+
+    for (int i = 0; i < 8; i++) {
+      auto child = m_Children[i];
+      Results.push_back(child);
+      child->GetChildren(Results);
+    }
+  }
+
+  Ogre::AxisAlignedBox GetAABB() {
+    return Ogre::AxisAlignedBox(m_Origin - m_Extents, m_Origin + m_Extents);
   }
 
 protected:
