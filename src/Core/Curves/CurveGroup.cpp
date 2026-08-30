@@ -121,8 +121,26 @@ void CurveGroup::RefreshTree() {
     delete m_CurveTree;
   }
 
-  m_CurveTree = new Octree<Curve *>(Ogre::Vector3::ZERO,
-                                    Ogre::Vector3(20000, 20000, 20000));
+  auto maxDistanceSq = 0;
+
+  for (auto kvp : m_Curves) {
+    auto curve = kvp.second;
+    auto p0 = curve->Evaluate(0);
+    auto p1 = curve->Evaluate(curve->GetLength());
+
+    if (p0.squaredLength() > maxDistanceSq) {
+      maxDistanceSq = p0.squaredLength();
+    }
+
+    if (p1.squaredLength() > maxDistanceSq) {
+      maxDistanceSq = p1.squaredLength();
+    }
+  }
+
+  auto dim = 100 + Ogre::Math::Sqrt(maxDistanceSq);
+
+  m_CurveTree =
+      new Octree<Curve *>(Ogre::Vector3::ZERO, Ogre::Vector3::UNIT_SCALE * dim);
 
   for (auto kvp : m_Curves) {
     auto curve = kvp.second;

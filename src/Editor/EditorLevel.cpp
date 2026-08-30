@@ -19,8 +19,6 @@
 
 #include <cassert>
 
-#include "Debug/OctreeDebug.h"
-
 using json = nlohmann::json;
 
 void EditorLevel::Init() {
@@ -53,6 +51,7 @@ void EditorLevel::Init() {
   // Gameplay bits
   m_CurveGroup = new CurveGroup();
   GEngine::Register(m_CurveGroup);
+  m_CurveTreeVisualiser = world->CreateEntity<OctreeVisualiser<Curve *>>();
 
   // Editor bits
   m_GUI = new EditorGUI(this);
@@ -69,14 +68,9 @@ void EditorLevel::Cleanup() { delete m_CurveGroup; }
 
 void EditorLevel::BeginPlay() {
   m_CurveGroup->RefreshTree();
+  m_CurveTreeVisualiser->ShowGizmos(m_CurveGroup->GetTree());
 
   Level::BeginPlay();
-
-  auto world = GEngine::Get<World>();
-  auto sceneManager = world->GetSceneManager();
-  auto root = sceneManager->getRootSceneNode();
-
-  OctreeDebug<Curve *>::ShowGizmos(root, m_CurveGroup->GetTree());
 }
 
 void EditorLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }

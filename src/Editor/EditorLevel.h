@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Visuals/OctreeVisualiser.h"
+
 #include "Core/Curves/CurveGroup.h"
 #include "Core/Entity.h"
 #include "Core/GUI.h"
@@ -50,6 +52,7 @@ private:
   float m_CameraDistance;
 
   CurveGroup *m_CurveGroup;
+  OctreeVisualiser<Curve *> *m_CurveTreeVisualiser;
 
   int m_CurrentIndex;
   GUI *m_GUI;
