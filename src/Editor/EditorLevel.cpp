@@ -68,7 +68,6 @@ void EditorLevel::Cleanup() { delete m_CurveGroup; }
 
 void EditorLevel::BeginPlay() {
   m_CurveGroup->RefreshTree();
-  m_CurveTreeVisualiser->ShowGizmos(m_CurveGroup->GetTree());
 
   Level::BeginPlay();
 }
@@ -330,6 +329,19 @@ void EditorLevel::DeleteEntity() {
   if (m_Entities.size() > 0) {
     m_CurrentIndex = m_Entities.size() - 1;
     m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(true);
+  }
+}
+
+void EditorLevel::ShowDebugVisuals(const DebugVisualType &VisualType) {
+  switch (VisualType) {
+  case DebugVisualType::None:
+    m_CurveTreeVisualiser->RemoveGizmos();
+    break;
+  case DebugVisualType::CurveOctree:
+    m_CurveTreeVisualiser->ShowGizmos(m_CurveGroup->GetTree());
+    break;
+  default:
+    break;
   }
 }
 

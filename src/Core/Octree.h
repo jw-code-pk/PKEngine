@@ -1,12 +1,17 @@
 #pragma once
 
 #include <Ogre.h>
+#include <algorithm>
 
 template <typename T> class Octree {
 public:
   struct OctreeNode {
     const T Data;
     const Ogre::Vector3 Origin;
+
+    bool operator==(const OctreeNode &Other) {
+      return (Data == Other.Data && Origin == Other.Origin);
+    }
   };
 
   Octree(const Ogre::Vector3 &Origin, const Ogre::Vector3 &Extents,
@@ -14,6 +19,7 @@ public:
     m_Origin = Origin;
     m_Extents = Extents;
     m_MaxNodeCount = NodesPerSplit;
+    m_HasSplit = false;
   }
 
   ~Octree() {
@@ -46,10 +52,38 @@ public:
     return true;
   }
 
+  bool TryRemove(const Ogre::Vector3 &Origin, T Data) {
+    auto node = OctreeNode{.Data = Data, .Origin = Origin};
+    return TryRemove(node);
+  }
+
+  bool TryRemove(const OctreeNode &Node) {
+    if (m_HasSplit) {
+      for (int i = 0; i < 8; i++) {
+        if (m_Children[i]->TryRemove(Node)) {
+          return true;
+        }
+      }
+    } else if (HasOverlap(Node.Origin)) {
+      auto iter = std::find(m_Data.begin(), m_Data.end(), Node);
+
+      if (iter != m_Data.end()) {
+        m_Data.erase(iter);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   void ClearAll() {
     m_Data.clear();
-    for (auto child : m_Children) {
-      child->ClearAll();
+
+    if (m_HasSplit) {
+      for (int i = 0; i < 8; i++) {
+        auto child = m_Children[i];
+        child->ClearAll();
+      }
     }
   }
 
@@ -102,6 +136,8 @@ protected:
   }
 
   void Split() {
+    assert(!m_HasSplit && "Split should only be called once on an octree.");
+
     const auto halfExtents = m_Extents * 0.5f;
 
     m_Children[0] = new Octree(
@@ -139,7 +175,9 @@ protected:
   }
 
   void AddToChildren(const OctreeNode &Node) {
-    for (auto child : m_Children) {
+    for (int i = 0; i < 8; i++) {
+      auto child = m_Children[i];
+
       if (child->TryAdd(Node)) {
         return;
       }

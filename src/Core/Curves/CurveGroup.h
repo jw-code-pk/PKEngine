@@ -12,6 +12,9 @@ public:
     bool IsValid() { return Curve != nullptr; }
   };
 
+  CurveGroup();
+  ~CurveGroup();
+
   void Register(Curve *Curve);
   void Unregister(Curve *Curve);
 

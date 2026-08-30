@@ -23,12 +23,8 @@ public:
   }
 
   void ShowGizmos(Octree<T> *Tree) {
-    for (auto box : m_Boxes) {
-      delete box;
-    }
-    m_Boxes.clear();
+    RemoveGizmos();
 
-    GetRoot()->removeAndDestroyAllChildren();
     CreateOctreeGizmo(GetRoot(), Tree);
 
     std::vector<Octree<T> *> children;
@@ -37,6 +33,15 @@ public:
     for (auto child : children) {
       CreateOctreeGizmo(GetRoot(), child);
     }
+  }
+
+  void RemoveGizmos() {
+    for (auto box : m_Boxes) {
+      delete box;
+    }
+    m_Boxes.clear();
+
+    GetRoot()->removeAndDestroyAllChildren();
   }
 
 protected:

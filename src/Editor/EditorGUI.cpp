@@ -147,6 +147,14 @@ void EditorGUI::DrawLeftPanel() {
     m_Level->EndPlay();
   }
 
+  if (ImGui::Checkbox("Show Curve Octree", &m_ShowCurveOctree)) {
+    if (m_ShowCurveOctree) {
+      m_Level->ShowDebugVisuals(EditorLevel::DebugVisualType::CurveOctree);
+    } else {
+      m_Level->ShowDebugVisuals(EditorLevel::DebugVisualType::None);
+    }
+  }
+
   ImGui::EndChild();
 }
 

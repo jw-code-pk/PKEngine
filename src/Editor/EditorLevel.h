@@ -10,6 +10,11 @@
 
 class EditorLevel : public Level {
 public:
+  enum class DebugVisualType {
+    None,
+    CurveOctree,
+  };
+
   virtual void Init() override;
   virtual void Cleanup() override;
 
@@ -40,6 +45,8 @@ public:
   void CreateEntity(const Ogre::String &TypeId,
                     const Ogre::Vector3 &Position = Ogre::Vector3::ZERO);
   void DeleteEntity();
+
+  void ShowDebugVisuals(const DebugVisualType &VisualType);
 
 protected:
   Entity *SpawnFromTypeId(const Ogre::String &TypeId);

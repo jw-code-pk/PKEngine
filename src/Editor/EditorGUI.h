@@ -24,4 +24,6 @@ private:
   float m_CameraDistance;
 
   int m_EntityTypeSelectIndex;
+
+  bool m_ShowCurveOctree;
 };

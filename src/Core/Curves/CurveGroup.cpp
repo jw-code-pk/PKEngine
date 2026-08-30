@@ -6,11 +6,25 @@
 const float STEP_SIZE = 10.0f;
 const float STEP_SIZE_SQ = STEP_SIZE * STEP_SIZE;
 
+CurveGroup::CurveGroup() {
+  m_CurveTree = new Octree<Curve *>(Ogre::Vector3::ZERO,
+                                    Ogre::Vector3::UNIT_SCALE * 35000);
+}
+
+CurveGroup::~CurveGroup() {
+  if (m_CurveTree != nullptr) {
+    m_CurveTree->ClearAll();
+    delete m_CurveTree;
+  }
+}
+
 void CurveGroup::Register(Curve *Curve) {
   assert(Curve && "Curve should not be null.");
 
   auto key = Curve->GetCurveId();
   m_Curves[key] = Curve;
+
+  RefreshTree();
 }
 
 void CurveGroup::Unregister(Curve *Curve) {
@@ -18,6 +32,8 @@ void CurveGroup::Unregister(Curve *Curve) {
 
   auto key = Curve->GetCurveId();
   m_Curves.erase(key);
+
+  RefreshTree();
 }
 
 CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
@@ -137,7 +153,8 @@ void CurveGroup::RefreshTree() {
     }
   }
 
-  auto dim = 100 + Ogre::Math::Sqrt(maxDistanceSq);
+  auto dim =
+      100 + Ogre::Math::Sqrt(maxDistanceSq); // adding 100 for some padding
 
   m_CurveTree =
       new Octree<Curve *>(Ogre::Vector3::ZERO, Ogre::Vector3::UNIT_SCALE * dim);
