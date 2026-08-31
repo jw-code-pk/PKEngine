@@ -10,7 +10,6 @@ Curve::Curve(Ogre::SceneNode *Root) : Entity(Root) { m_CurveID = NextID++; }
 
 void Curve::ShowGizmos() {
   auto world = GEngine::Get<World>();
-
   auto gizmoId = std::format("{}_{}", GetTypeId(), GetCurveId());
   auto sceneManager = world->GetSceneManager();
 

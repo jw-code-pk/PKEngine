@@ -6,7 +6,9 @@ class TriggerProbe;
 
 class Trigger {
 public:
-  virtual Ogre::Vector3 GetOrigin() = 0;
+  virtual Ogre::AxisAlignedBox GetAAB() = 0;
+
+  virtual ~Trigger() = default;
 
   virtual bool CheckOverlap(TriggerProbe *Probe) = 0;
 

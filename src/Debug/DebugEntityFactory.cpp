@@ -7,8 +7,7 @@
 
 #include "Debug/Cube.h"
 #include "Debug/Ninja.h"
-
-const char *ENTITY_LIST[] = {"Ninja", "Arc", "Line", "Cube"};
+#include "Debug/Triggers/BounceTrigger.h"
 
 DebugEntityFactory::DebugEntityFactory() {
 
@@ -16,6 +15,7 @@ DebugEntityFactory::DebugEntityFactory() {
   m_AvailableEnities.push_back("Arc");
   m_AvailableEnities.push_back("Line");
   m_AvailableEnities.push_back("Cube");
+  m_AvailableEnities.push_back("Bounce");
 
   GEngine::Register<EntityFactory>(this);
 }
@@ -37,6 +37,8 @@ Entity *DebugEntityFactory::Spawn(const Ogre::String &TypeId) {
     result = world->CreateEntity<Line>();
   } else if (TypeId == "Cube") {
     result = world->CreateEntity<Cube>();
+  } else if (TypeId == "Bounce") {
+    result = world->CreateEntity<BounceTrigger>();
   }
 
   return result;

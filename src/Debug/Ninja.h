@@ -1,21 +1,31 @@
 #pragma once
-
 #include "NinjaSM/NinjaSM.h"
+
+#include "Core/Triggers/TriggerProbe.h"
+#include "Core/Triggers/TriggerSweeper.h"
 
 #include "Core/Curves/CurveFollower.h"
 #include <OgrePrerequisites.h>
 
-class Ninja : public CurveFollower {
+class Ninja : public CurveFollower, public TriggerProbe {
 public:
+  virtual Ogre::String GetTypeId() override { return "Ninja"; }
+
   Ninja(Ogre::SceneNode *Root);
   ~Ninja();
 
-  virtual Ogre::String GetTypeId() override { return "Ninja"; }
-  virtual bool Init() override;
+  // Entity Lifecycle
 
+  virtual bool Init() override;
   virtual void BeginPlay() override;
   virtual void Tick(const float &DeltaTime) override;
   virtual void EndPlay() override;
+
+  // Trigger Probe
+
+  virtual Ogre::AxisAlignedBox GetAAB() override;
+  virtual bool OnEnter(Trigger *Tripped) override;
+  virtual bool OnExit(Trigger *Tripped) override;
 
   void ChangeAnim(const Ogre::String &Name);
   void FaceDirection(const Ogre::Vector3 &Direction);
@@ -42,5 +52,6 @@ private:
   Ogre::AnimationState *m_ActiveAnim;
   Ogre::AnimationStateSet *m_AnimSet;
 
+  TriggerSweeper *m_TriggerSweeper;
   NinjaSM *m_StateMachine;
 };

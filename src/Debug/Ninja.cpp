@@ -3,8 +3,12 @@
 #include "NinjaSM/States/NinjaJumpState.h"
 #include "NinjaSM/States/NinjaWalkState.h"
 
+#include "Triggers/BounceTrigger.h"
+
 #include "Core/GEngine.h"
+#include "Core/Triggers/TriggerGroupRegistry.h"
 #include "Core/World.h"
+
 #include <OgreMath.h>
 #include <cassert>
 
@@ -17,6 +21,10 @@ Ninja::Ninja(Ogre::SceneNode *Root) : CurveFollower(Root) {
 Ninja::~Ninja() {
   m_StateMachine->RemoveAllStates(true);
   delete m_StateMachine;
+
+  if (m_TriggerSweeper != nullptr) {
+    delete m_TriggerSweeper;
+  }
 }
 
 bool Ninja::Init() {
@@ -42,6 +50,13 @@ bool Ninja::Init() {
 
   auto pitch = -0.15 * Ogre::Math::HALF_PI;
   camNode->pitch(Ogre::Radian(pitch));
+
+  // Trigger Sweep
+  if (m_TriggerSweeper == nullptr) {
+    auto groupRegistry = GEngine::Get<TriggerGroupRegistry>();
+    auto group = groupRegistry->Get("Player");
+    m_TriggerSweeper = new TriggerSweeper(this, group);
+  }
 
   // TODO: Debug - print all anim states
 
@@ -77,11 +92,28 @@ void Ninja::Tick(const float &DeltaTime) {
 
   TickPhysics(DeltaTime);
 
+  m_TriggerSweeper->RunSweep();
+
   GetRoot()->setOrientation(CurveFollower::CalculateOrientation());
   m_ActiveAnim->addTime(DeltaTime * 3);
 }
 
 void Ninja::EndPlay() {}
+
+Ogre::AxisAlignedBox Ninja::GetAAB() {
+  const auto origin = m_PawnNode->getPosition();
+  const auto extents = Ogre::Vector3::UNIT_SCALE * 50;
+  return Ogre::AxisAlignedBox(origin - extents, origin + extents);
+}
+
+bool Ninja::OnEnter(Trigger *Tripped) {
+  if (auto bounce = dynamic_cast<BounceTrigger *>(Tripped)) {
+    m_StateMachine->ChangeState<NinjaJumpState>();
+  }
+  return true;
+}
+
+bool Ninja::OnExit(Trigger *Tripped) { return true; }
 
 void Ninja::ChangeAnim(const Ogre::String &Name) {
   assert(m_AnimSet->hasAnimationState(Name) &&

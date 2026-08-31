@@ -22,9 +22,9 @@ void TriggerGroup::Fetch(TriggerProbe *Probe, std::set<Trigger *> &Results) {
 }
 
 void TriggerGroup::Register(Trigger *Trig) {
-  m_Triggers->TryAdd(Trig->GetOrigin(), Trig);
+  m_Triggers->TryAdd(Trig->GetAAB().getCenter(), Trig);
 }
 
 void TriggerGroup::Unregister(Trigger *Trig) {
-  m_Triggers->TryRemove(Trig->GetOrigin(), Trig);
+  m_Triggers->TryRemove(Trig->GetAAB().getCenter(), Trig);
 }

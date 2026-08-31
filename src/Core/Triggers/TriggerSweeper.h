@@ -6,13 +6,15 @@
 
 class TriggerSweeper {
 public:
-  TriggerSweeper(TriggerGroup *Group);
+  TriggerSweeper(TriggerProbe *Probe, TriggerGroup *Group);
   ~TriggerSweeper();
 
-  void RunSweep(TriggerProbe *Probe);
+  void RunSweep();
 
 private:
   TriggerGroup *m_Group;
+  TriggerProbe *m_Probe;
+
   std::set<Trigger *> m_ActiveSet;
   std::set<Trigger *> m_QuerySet;
 };

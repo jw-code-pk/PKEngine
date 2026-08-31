@@ -7,9 +7,9 @@ Cube::Cube(Ogre::SceneNode *Root) : Entity(Root) { m_CanTick = false; }
 
 bool Cube::Init() {
   World *world = GEngine::Get<World>();
-  auto m_SceneManager = world->GetSceneManager();
+  auto sceneManager = world->GetSceneManager();
 
-  Ogre::Entity *cubeMesh = m_SceneManager->createEntity("Cube.mesh");
+  Ogre::Entity *cubeMesh = sceneManager->createEntity("Cube.mesh");
   Ogre::SceneNode *cubeNode = GetRoot()->createChildSceneNode();
   cubeNode->attachObject(cubeMesh);
   cubeNode->setInheritScale(false);

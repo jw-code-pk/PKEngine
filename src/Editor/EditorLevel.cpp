@@ -382,8 +382,8 @@ void EditorLevel::DisplayTestImage() {
   overlayMgr.setPixelRatio(1.0f);
 
   panel->setMetricsMode(Ogre::GMM_RELATIVE_ASPECT_ADJUSTED);
-  panel->setPosition(100.0f, 100.0f);   // Top-Left at 10% screen width/height
-  panel->setDimensions(512.0f, 512.0f); // 30% screen width/height
+  panel->setPosition(100.0f, 100.0f);
+  panel->setDimensions(512.0f, 512.0f);
 
   panel->setMaterialName("UIImageMaterial");
 
