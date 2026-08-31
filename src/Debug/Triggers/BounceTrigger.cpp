@@ -6,7 +6,16 @@
 #include "Core/Triggers/TriggerProbe.h"
 #include "Core/World.h"
 
+#include <OgreWireBoundingBox.h>
+
 BounceTrigger::BounceTrigger(Ogre::SceneNode *Root) : Entity(Root) {}
+
+Ogre::AxisAlignedBox BounceTrigger::GetAAB() {
+  auto origin = GetRoot()->getPosition();
+  auto extents = Ogre::Vector3::UNIT_SCALE * 50;
+
+  return Ogre::AxisAlignedBox(origin - extents, origin + extents);
+}
 
 bool BounceTrigger::Init() {
   auto world = GEngine::Get<World>();
@@ -25,12 +34,6 @@ bool BounceTrigger::Init() {
 void BounceTrigger::BeginPlay() {
   auto registery = GEngine::Get<TriggerGroupRegistry>();
   auto group = registery->Get("Player");
-
-  // TODO: this needs to move somewhere else - maybe Init()?
-  auto origin = GetRoot()->getPosition();
-  auto extents = Ogre::Vector3::UNIT_SCALE * 50;
-  m_AAB = Ogre::AxisAlignedBox(origin - extents, origin + extents);
-
   group->Register(this);
 }
 
@@ -41,7 +44,7 @@ void BounceTrigger::EndPlay() {
 }
 
 bool BounceTrigger::CheckOverlap(TriggerProbe *Probe) {
-  return m_AAB.intersects(Probe->GetAAB());
+  return GetAAB().intersects(Probe->GetAAB());
 }
 
 void BounceTrigger::OnEnter(TriggerProbe *Probe) {

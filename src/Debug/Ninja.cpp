@@ -101,13 +101,16 @@ void Ninja::Tick(const float &DeltaTime) {
 void Ninja::EndPlay() {}
 
 Ogre::AxisAlignedBox Ninja::GetAAB() {
-  const auto origin = m_PawnNode->getPosition();
+  const auto origin = GetRoot()->getPosition() + m_PawnNode->getPosition();
   const auto extents = Ogre::Vector3::UNIT_SCALE * 50;
   return Ogre::AxisAlignedBox(origin - extents, origin + extents);
 }
 
 bool Ninja::OnEnter(Trigger *Tripped) {
+  GEngine::Log("Ninja tripped a trigger.");
+
   if (auto bounce = dynamic_cast<BounceTrigger *>(Tripped)) {
+    GEngine::Log("Ninja bounce hit.");
     m_StateMachine->ChangeState<NinjaJumpState>();
   }
   return true;

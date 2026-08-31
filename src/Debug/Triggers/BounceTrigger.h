@@ -9,7 +9,7 @@ public:
 
   BounceTrigger(Ogre::SceneNode *Root);
 
-  virtual Ogre::AxisAlignedBox GetAAB() override { return m_AAB; }
+  virtual Ogre::AxisAlignedBox GetAAB() override;
 
   virtual bool Init() override;
 
@@ -19,7 +19,4 @@ public:
   virtual bool CheckOverlap(TriggerProbe *Probe) override;
   virtual void OnEnter(TriggerProbe *Probe) override;
   virtual void OnExit(TriggerProbe *Probe) override;
-
-private:
-  Ogre::AxisAlignedBox m_AAB;
 };
