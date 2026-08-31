@@ -46,9 +46,10 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
       Position + Ogre::Vector3::UNIT_SCALE * std::numeric_limits<float>::max();
   auto closestDistance = 0.0f;
 
+  auto extents = Ogre::Vector3::UNIT_SCALE * Range;
+  auto aab = Ogre::AxisAlignedBox(Position - extents, Position + extents);
   std::set<Curve *> curveResults;
-  m_CurveTree->FetchAll(Position, Ogre::Vector3(Range, Range, Range),
-                        curveResults);
+  m_CurveTree->FetchAll(aab, curveResults);
 
   for (const auto c : curveResults) {
     if (c->GetCurveId() == IgnoreId) {
@@ -85,10 +86,10 @@ CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position, const int &IgnoreId,
       Ogre::Vector3(1, -1, 1) * std::numeric_limits<float>::max();
 
   auto closestDistance = 0.0f;
-
+  auto extents = Ogre::Vector3::UNIT_SCALE * Range;
+  auto aab = Ogre::AxisAlignedBox(Position - extents, Position + extents);
   std::set<Curve *> curveResults;
-  m_CurveTree->FetchAll(Position, Ogre::Vector3(Range, Range, Range),
-                        curveResults);
+  m_CurveTree->FetchAll(aab, curveResults);
 
   for (const auto c : curveResults) {
     if (c->GetCurveId() == IgnoreId) {

@@ -53,7 +53,7 @@ protected:
         "BaseWhiteNoLighting", Ogre::RGN_INTERNAL);
     auto box = new Ogre::WireBoundingBox();
     m_Boxes.push_back(box);
-    box->setupBoundingBox(Tree->GetAABB());
+    box->setupBoundingBox(Tree->GetAAB());
     box->setMaterial(mat);
 
     auto node = Root->createChildSceneNode();

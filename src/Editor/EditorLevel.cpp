@@ -52,6 +52,9 @@ void EditorLevel::Init() {
   m_CurveGroup = new CurveGroup();
   GEngine::Register(m_CurveGroup);
   m_CurveTreeVisualiser = world->CreateEntity<OctreeVisualiser<Curve *>>();
+  m_TriggerGroupRegistry = new TriggerGroupRegistry();
+  m_TriggerGroupRegistry->Create("Player", Ogre::Vector3::ZERO,
+                                 Ogre::Vector3::UNIT_SCALE * 10000);
 
   // Editor bits
   m_GUI = new EditorGUI(this);

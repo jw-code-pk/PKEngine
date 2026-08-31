@@ -6,8 +6,8 @@
 template <typename T> class Octree {
 public:
   struct OctreeNode {
-    const T Data;
-    const Ogre::Vector3 Origin;
+    T Data;
+    Ogre::Vector3 Origin;
 
     bool operator==(const OctreeNode &Other) {
       return (Data == Other.Data && Origin == Other.Origin);
@@ -16,8 +16,7 @@ public:
 
   Octree(const Ogre::Vector3 &Origin, const Ogre::Vector3 &Extents,
          const int &NodesPerSplit = 4) {
-    m_Origin = Origin;
-    m_Extents = Extents;
+    m_AAB = Ogre::AxisAlignedBox(Origin - Extents, Origin + Extents);
     m_MaxNodeCount = NodesPerSplit;
     m_HasSplit = false;
   }
@@ -87,15 +86,14 @@ public:
     }
   }
 
-  void FetchAll(const Ogre::Vector3 &Point, const Ogre::Vector3 &Extents,
-                std::set<T> &Results) const {
-    if (!HasOverlap(Point, Extents)) {
+  void FetchAll(const Ogre::AxisAlignedBox &Area, std::set<T> &Results) const {
+    if (!HasOverlap(Area)) {
       return;
     }
 
     if (m_HasSplit) {
       for (auto child : m_Children) {
-        child->FetchAll(Point, Extents, Results);
+        child->FetchAll(Area, Results);
       }
     } else if (m_Data.size() > 0) {
       // Results.insert(Results.end(), m_Data.begin(), m_Data.end());
@@ -117,54 +115,47 @@ public:
     }
   }
 
-  Ogre::AxisAlignedBox GetAABB() {
-    return Ogre::AxisAlignedBox(m_Origin - m_Extents, m_Origin + m_Extents);
-  }
+  Ogre::AxisAlignedBox GetAAB() { return m_AAB; }
 
 protected:
   bool HasOverlap(const Ogre::Vector3 &Point) const {
-    return std::abs(Point.x - m_Origin.x) <= m_Extents.x &&
-           std::abs(Point.y - m_Origin.y) <= m_Extents.y &&
-           std::abs(Point.z - m_Origin.z) <= m_Extents.z;
+    return m_AAB.intersects(Point);
   }
 
-  bool HasOverlap(const Ogre::Vector3 &Point,
-                  const Ogre::Vector3 &Extents) const {
-    return std::abs(Point.x - m_Origin.x) <= (Extents.x + m_Extents.x) &&
-           std::abs(Point.y - m_Origin.y) <= (Extents.y + m_Extents.y) &&
-           std::abs(Point.z - m_Origin.z) <= (Extents.z + m_Extents.z);
+  bool HasOverlap(const Ogre::AxisAlignedBox &Box) const {
+    return m_AAB.intersects(Box);
   }
 
   void Split() {
     assert(!m_HasSplit && "Split should only be called once on an octree.");
 
-    const auto halfExtents = m_Extents * 0.5f;
+    const auto origin = m_AAB.getCenter();
+    const auto halfExtents = m_AAB.getHalfSize() * 0.5f;
 
     m_Children[0] = new Octree(
-        m_Origin + Ogre::Vector3(halfExtents.x, halfExtents.y, halfExtents.z),
+        origin + Ogre::Vector3(halfExtents.x, halfExtents.y, halfExtents.z),
         halfExtents, m_MaxNodeCount);
     m_Children[1] = new Octree(
-        m_Origin + Ogre::Vector3(halfExtents.x, halfExtents.y, -halfExtents.z),
+        origin + Ogre::Vector3(halfExtents.x, halfExtents.y, -halfExtents.z),
         halfExtents, m_MaxNodeCount);
     m_Children[2] = new Octree(
-        m_Origin + Ogre::Vector3(-halfExtents.x, halfExtents.y, halfExtents.z),
+        origin + Ogre::Vector3(-halfExtents.x, halfExtents.y, halfExtents.z),
         halfExtents, m_MaxNodeCount);
     m_Children[3] = new Octree(
-        m_Origin + Ogre::Vector3(-halfExtents.x, halfExtents.y, -halfExtents.z),
+        origin + Ogre::Vector3(-halfExtents.x, halfExtents.y, -halfExtents.z),
         halfExtents, m_MaxNodeCount);
     m_Children[4] = new Octree(
-        m_Origin + Ogre::Vector3(halfExtents.x, -halfExtents.y, halfExtents.z),
+        origin + Ogre::Vector3(halfExtents.x, -halfExtents.y, halfExtents.z),
         halfExtents, m_MaxNodeCount);
     m_Children[5] = new Octree(
-        m_Origin + Ogre::Vector3(halfExtents.x, -halfExtents.y, -halfExtents.z),
+        origin + Ogre::Vector3(halfExtents.x, -halfExtents.y, -halfExtents.z),
         halfExtents, m_MaxNodeCount);
     m_Children[6] = new Octree(
-        m_Origin + Ogre::Vector3(-halfExtents.x, -halfExtents.y, halfExtents.z),
+        origin + Ogre::Vector3(-halfExtents.x, -halfExtents.y, halfExtents.z),
         halfExtents, m_MaxNodeCount);
-    m_Children[7] =
-        new Octree(m_Origin + Ogre::Vector3(-halfExtents.x, -halfExtents.y,
-                                            -halfExtents.z),
-                   halfExtents, m_MaxNodeCount);
+    m_Children[7] = new Octree(
+        origin + Ogre::Vector3(-halfExtents.x, -halfExtents.y, -halfExtents.z),
+        halfExtents, m_MaxNodeCount);
 
     for (auto &node : m_Data) {
       AddToChildren(node);
@@ -185,8 +176,7 @@ protected:
   }
 
 private:
-  Ogre::Vector3 m_Origin;
-  Ogre::Vector3 m_Extents;
+  Ogre::AxisAlignedBox m_AAB;
 
   int m_MaxNodeCount;
   bool m_HasSplit;

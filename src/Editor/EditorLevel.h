@@ -6,6 +6,8 @@
 #include "Core/Entity.h"
 #include "Core/GUI.h"
 #include "Core/Level.h"
+#include "Core/Triggers/TriggerGroupRegistry.h"
+
 #include <OgrePrerequisites.h>
 
 class EditorLevel : public Level {
@@ -60,6 +62,8 @@ private:
 
   CurveGroup *m_CurveGroup;
   OctreeVisualiser<Curve *> *m_CurveTreeVisualiser;
+
+  TriggerGroupRegistry *m_TriggerGroupRegistry;
 
   int m_CurrentIndex;
   GUI *m_GUI;
