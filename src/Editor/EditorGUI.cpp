@@ -19,7 +19,7 @@ void EditorGUI::Tick(const float &DeltaTime) {
   if (ImGui::BeginMainMenuBar()) {
     if (ImGui::BeginMenu("PK Engine")) {
       if (ImGui::MenuItem("Save Level")) {
-        m_Level->SaveLevel("Test.json");
+        m_Level->SaveTo("Test.json");
       }
       ImGui::EndMenu();
     }

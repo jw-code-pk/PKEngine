@@ -1,14 +1,21 @@
 #include <iostream>
 
 #include "Core/App.h"
+#include "Core/EntityFactory.h"
 #include "Core/GEngine.h"
 
-#include "Debug/DebugEntityFactory.h"
+#include "RegisterEntities.h"
+
+EntityFactory *CreateEntityFactory() {
+  auto entityFactory = new EntityFactory();
+  RegisterEntities(entityFactory);
+  return entityFactory;
+}
 
 int main(int argc, char *argv[]) {
   try {
     auto gEngine = new GEngine();
-    auto entityFactory = new DebugEntityFactory();
+    auto entityFactory = CreateEntityFactory();
 
     App app;
     app.initApp();

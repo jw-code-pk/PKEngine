@@ -1,6 +1,7 @@
 #include "World.h"
 #include "Editor/EditorLevel.h"
 #include "GEngine.h"
+#include "Levels/GameplayLevel.h"
 
 World::World(Ogre::SceneManager *SceneManager,
              Ogre::RenderWindow *RenderWindow) {
@@ -13,7 +14,7 @@ World::World(Ogre::SceneManager *SceneManager,
 
 World::~World() {
   if (m_ActiveLevel != nullptr) {
-    m_ActiveLevel->Cleanup();
+    m_ActiveLevel->Unload();
     delete m_ActiveLevel;
   }
 
@@ -22,9 +23,18 @@ World::~World() {
   m_SceneManager = nullptr;
 }
 
-void World::LoadLevel() {
+void World::LoadLevel(const Ogre::String &Filename) {
+  assert(m_ActiveLevel == nullptr && "There is already a level loaded.");
+
+  m_ActiveLevel = new GameplayLevel();
+  m_ActiveLevel->Load(Filename);
+}
+
+void World::LoadEditorLevel() {
+  assert(m_ActiveLevel == nullptr && "There is already a level loaded.");
+
   m_ActiveLevel = new EditorLevel();
-  m_ActiveLevel->Init();
+  m_ActiveLevel->Load("Test.json");
 }
 
 void World::FrameTick(const float &DeltaTime) {

@@ -58,12 +58,10 @@ public:
   };
 
   template <std::derived_from<State> U> void ChangeState() {
-    auto key = std::type_index(typeid(U));
+    auto key = StateIndex(U);
     auto nextState = m_States[key];
 
-    assert(
-        nextState != nullptr &&
-        std::format("No state for {} registered.", typeid(U).name()).c_str());
+    assert(nextState != nullptr && "The requested state is not registered.");
 
     if (nextState == m_CurrentState) {
       return;
@@ -74,7 +72,6 @@ public:
     }
 
     m_CurrentState = m_States[key];
-
     m_CurrentState->Enter(m_Target);
   };
 

@@ -85,7 +85,10 @@ Curve::QueryResult Curve::FindClosestPointIgnoreY(const Ogre::Vector3 &Position,
     auto proj = Position;
     proj.y = p.y;
 
-    const auto d1 = proj.squaredDistance(closestPoint);
+    auto projC = closestPoint;
+    projC.y = p.y;
+
+    const auto d1 = proj.squaredDistance(projC);
     const auto d2 = proj.squaredDistance(p);
 
     if (d2 < d1) {

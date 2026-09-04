@@ -14,7 +14,7 @@ public:
     return !HasCurve() || m_Distance < 0 || m_Distance > m_Curve->GetLength();
   }
 
-  inline bool CalculateCoyoteDistance() {
+  inline float CalculateCoyoteDistance() {
     if (HasCurve()) {
       return m_Distance < 0 ? -1 * m_Distance
                             : m_Distance - m_Curve->GetLength();
@@ -39,6 +39,7 @@ public:
   void SetSpeed(const float &Speed) { m_Speed = Speed; }
 
   Ogre::Quaternion CalculateOrientation();
+  Ogre::Vector3 GetFollowVelocity();
 
 private:
   Curve *m_Curve;

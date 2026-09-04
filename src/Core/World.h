@@ -1,21 +1,22 @@
 #pragma once
 
-#include <concepts>
-#include <vector>
-
-#include "Ogre.h"
-#include <OgreSceneManager.h>
-
 #include "Entity.h"
 #include "GUI.h"
-#include "Level.h"
+#include "Levels/Level.h"
+
+#include <OgreSceneManager.h>
+
+#include <concepts>
+#include <vector>
 
 class World {
 public:
   World(Ogre::SceneManager *SceneManager, Ogre::RenderWindow *RenderWindow);
   ~World();
 
-  void LoadLevel();
+  void LoadLevel(const Ogre::String &Filename);
+  void LoadEditorLevel();
+
   void FrameTick(const float &DeltaTime);
   void UITick(const float &DeltaTime);
 

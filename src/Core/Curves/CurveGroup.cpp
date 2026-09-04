@@ -4,7 +4,7 @@
 #include <limits>
 
 const float STEP_SIZE = 10.0f;
-const float STEP_SIZE_SQ = STEP_SIZE * STEP_SIZE;
+const float QUERY_EXTENT_DIM = 2000.0f;
 
 CurveGroup::CurveGroup() {
   m_CurveTree = new Octree<Curve *>(Ogre::Vector3::ZERO,
@@ -45,8 +45,9 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
   auto closestPoint =
       Position + Ogre::Vector3::UNIT_SCALE * std::numeric_limits<float>::max();
   auto closestDistance = 0.0f;
+  auto rangeSq = Range * Range;
 
-  auto extents = Ogre::Vector3::UNIT_SCALE * Range;
+  auto extents = Ogre::Vector3::UNIT_SCALE * QUERY_EXTENT_DIM;
   auto aab = Ogre::AxisAlignedBox(Position - extents, Position + extents);
   std::set<Curve *> curveResults;
   m_CurveTree->FetchAll(aab, curveResults);
@@ -58,7 +59,7 @@ CurveGroup::QueryResult CurveGroup::FindClosest(const Ogre::Vector3 &Position,
 
     auto p = c->FindClosestPoint(Position, STEP_SIZE);
 
-    if (Position.squaredDistance(p.Point) > STEP_SIZE_SQ) {
+    if (Position.squaredDistance(p.Point) > rangeSq) {
       continue;
     }
 
@@ -84,9 +85,10 @@ CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position, const int &IgnoreId,
   Curve *closestCurve = nullptr;
   auto closestPoint =
       Ogre::Vector3(1, -1, 1) * std::numeric_limits<float>::max();
+  auto rangeSq = Range * Range;
 
   auto closestDistance = 0.0f;
-  auto extents = Ogre::Vector3::UNIT_SCALE * Range;
+  auto extents = Ogre::Vector3::UNIT_SCALE * QUERY_EXTENT_DIM;
   auto aab = Ogre::AxisAlignedBox(Position - extents, Position + extents);
   std::set<Curve *> curveResults;
   m_CurveTree->FetchAll(aab, curveResults);
@@ -104,27 +106,24 @@ CurveGroup::FindClosestBelow(const Ogre::Vector3 &Position, const int &IgnoreId,
     }
 
     auto p = c->FindClosestPointIgnoreY(Position, STEP_SIZE);
-    auto projC = p.Point;
-    projC.y = 0;
-
-    auto projP = Position;
+    auto projP = p.Point;
     projP.y = 0;
 
+    auto proj = Position;
+    proj.y = 0;
+
     // check that the point is not too far away
-    if (projP.squaredDistance(projC) > STEP_SIZE_SQ) {
+    if (proj.squaredDistance(projP) > rangeSq) {
       continue;
     }
 
-    const auto d1 = projP.squaredDistance(closestPoint);
-    const auto d2 = projP.squaredDistance(projC);
+    const auto d1 = Position.squaredDistance(closestPoint);
+    const auto d2 = Position.squaredDistance(p.Point);
 
-    // we are closer on the y axis already
-    bool bIsCloserOnY = Position.y - p.Point.y < Position.y - closestPoint.y;
-
-    if (d2 < d1 && bIsCloserOnY) {
+    if (d2 < d1) {
       closestCurve = c;
-      closestPoint = p.Point;
       closestDistance = p.Distance;
+      closestPoint = p.Point;
     }
   }
 

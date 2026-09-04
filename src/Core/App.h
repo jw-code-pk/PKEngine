@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Ogre.h"
 #include "OgreApplicationContext.h"
 #include <OgreFrameListener.h>
+#include <OgreImGuiInputListener.h>
+#include <OgreImGuiOverlay.h>
 #include <OgrePrerequisites.h>
 #include <OgreSceneManager.h>
 #include <OgreTrays.h>
@@ -38,4 +39,6 @@ private:
   InputManager *m_InputManager;
   Ogre::SceneManager *m_SceneManager;
   OgreBites::TrayManager *m_TrayManager;
+  Ogre::ImGuiOverlay *m_ImGuiOverlay;
+  OgreBites::ImGuiInputListener *m_ImGuiInputListener;
 };

@@ -21,10 +21,16 @@
 
 using json = nlohmann::json;
 
-void EditorLevel::Init() {
+void EditorLevel::CreateResources() {
+  GameplayLevel::CreateResources();
+
   // Scene setup
+
   auto world = GEngine::Get<World>();
   auto sceneManager = world->GetSceneManager();
+
+  // Environment & Lighting
+
   sceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
   sceneManager->setSkyBox(true, "Examples/SpaceSkyBox", 3000.0f);
 
@@ -38,6 +44,11 @@ void EditorLevel::Init() {
       groundEntity);
   groundEntity->setMaterialName("Examples/GrassFloor");
 
+  sceneManager->setFog(Ogre::FOG_LINEAR, Ogre::ColourValue(0.0, 0.0, 0.0), 1,
+                       500, 10000);
+
+  // Camera
+
   m_Camera = sceneManager->getRootSceneNode()->createChildSceneNode();
   Ogre::Camera *cam = world->CreateCamera("EditorCam");
   world->SetActiveCamera("EditorCam");
@@ -49,36 +60,25 @@ void EditorLevel::Init() {
   m_CameraDirection = Ogre::Vector3::UNIT_Z;
 
   // Gameplay bits
-  m_CurveGroup = new CurveGroup();
-  GEngine::Register(m_CurveGroup);
+
   m_CurveTreeVisualiser = world->CreateEntity<OctreeVisualiser<Curve *>>();
-  m_TriggerGroupRegistry = new TriggerGroupRegistry();
-  m_TriggerGroupRegistry->Create("Player", Ogre::Vector3::ZERO,
-                                 Ogre::Vector3::UNIT_SCALE * 35000);
 
   // Editor bits
+
   m_GUI = new EditorGUI(this);
   world->AddGUI(m_GUI);
 
   m_CurrentIndex = -1;
 
-  LoadLevel("Test.json");
-
   DisplayTestImage();
 }
 
-void EditorLevel::Cleanup() { delete m_CurveGroup; }
+void EditorLevel::DestroyResources() { GameplayLevel::DestroyResources(); }
 
-void EditorLevel::BeginPlay() {
-  m_CurveGroup->RefreshTree();
-
-  Level::BeginPlay();
-}
-
-void EditorLevel::Tick(const float &DeltaTime) { Level::Tick(DeltaTime); }
+void EditorLevel::BeginPlay() { GameplayLevel::BeginPlay(); }
 
 void EditorLevel::EndPlay() {
-  Level::EndPlay();
+  GameplayLevel::EndPlay();
 
   auto world = GEngine::Get<World>();
   world->SetActiveCamera("EditorCam");
@@ -224,7 +224,7 @@ void EditorLevel::SetCameraDirection(const Ogre::Vector3 &Direction) {
   CameraToEntity();
 }
 
-void EditorLevel::SaveLevel(const Ogre::String &Name) {
+void EditorLevel::SaveTo(const Ogre::String &Name) {
   json levelData;
   levelData["entities"] = json::array();
 
@@ -258,39 +258,6 @@ void EditorLevel::SaveLevel(const Ogre::String &Name) {
   }
 }
 
-void EditorLevel::LoadLevel(const Ogre::String &Name) {
-  std::ifstream file(Name);
-  if (!file.is_open()) {
-    return;
-  }
-
-  json levelData;
-  file >> levelData;
-
-  for (const auto &item : levelData["entities"]) {
-    std::string type = item["type_id"];
-
-    auto entity = SpawnFromTypeId(type);
-
-    if (!entity) {
-      continue;
-    }
-
-    auto pos = item["pos"];
-    entity->GetRoot()->setPosition(pos["x"], pos["y"], pos["z"]);
-
-    auto rot = item["rot"];
-    Ogre::Matrix3 rotMat;
-    rotMat.FromEulerAnglesYXZ(Ogre::Degree(rot["yaw"]),
-                              Ogre::Degree(rot["pitch"]),
-                              Ogre::Degree(rot["roll"]));
-    entity->GetRoot()->setOrientation(rotMat);
-
-    auto meta = item["meta"];
-    entity->SetMetadata(meta);
-  }
-}
-
 std::vector<Ogre::String> EditorLevel::GetAvailableEntities() {
   auto entityFactory = GEngine::Get<EntityFactory>();
   return entityFactory->GetAvailableEntities();
@@ -302,6 +269,10 @@ void EditorLevel::CreateEntity(const Ogre::String &TypeId,
 
   if (entity) {
     entity->GetRoot()->setPosition(Position);
+
+    if (const auto curve = dynamic_cast<Curve *>(entity)) {
+      m_CurveGroup->Register(curve);
+    }
 
     if (m_CurrentIndex >= 0) {
       m_Entities[m_CurrentIndex]->GetRoot()->showBoundingBox(false);
@@ -348,33 +319,11 @@ void EditorLevel::ShowDebugVisuals(const DebugVisualType &VisualType) {
   }
 }
 
-Entity *EditorLevel::SpawnFromTypeId(const Ogre::String &TypeId) {
-  auto entityFactory = GEngine::Get<EntityFactory>();
-  Entity *result = entityFactory->Spawn(TypeId);
-
-  if (result) {
-    result->Init();
-
-    if (const auto curve = dynamic_cast<Curve *>(result)) {
-      m_CurveGroup->Register(curve);
-    }
-
-    m_Entities.push_back(result);
-
-    if (result->CanTick()) {
-      m_TickList.push_back(result);
-    }
-  }
-
-  return result;
-}
-
 void EditorLevel::DisplayTestImage() {
-  // Load resources
+  // TODO: decide if this can vbe used for game UI
   auto resourceLoader = GEngine::Get<ResourceLoader>();
   resourceLoader->CreateUIMaterial("UIShared", "UIImageMaterial", "test.png");
 
-  // Display the image
   Ogre::OverlayManager &overlayMgr = Ogre::OverlayManager::getSingleton();
   Ogre::OverlayContainer *panel = static_cast<Ogre::OverlayContainer *>(
       overlayMgr.createOverlayElement("Panel", "ImagePanel"));

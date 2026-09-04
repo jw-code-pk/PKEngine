@@ -8,8 +8,8 @@ class Level {
 public:
   virtual ~Level() = default;
 
-  virtual void Init() = 0;
-  virtual void Cleanup() = 0;
+  virtual void Load(const Ogre::String &Filename) = 0;
+  virtual void Unload() = 0;
 
   virtual void BeginPlay();
   virtual void Tick(const float &DeltaTime);

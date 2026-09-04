@@ -40,8 +40,6 @@ void CurveFollower::Follow(Curve *Curve, const float &StartDistance) {
   m_Curve = Curve;
   m_Distance = StartDistance;
 
-  assert(!IsCoyote() && "Can't follow a curve with out of scope distance.");
-
   auto updatedPos = m_Curve->Evaluate(m_Distance);
   GetRoot()->setPosition(updatedPos);
 }
@@ -53,7 +51,8 @@ void CurveFollower::FollowClosest(const Ogre::Vector3 &Position,
   auto ignoreId = bIgnoreCurrent ? CurrentCurveId() : Curve::NoneID;
 
   auto queryResult = Group->FindClosest(Position, ignoreId, Range);
-  if (queryResult.IsValid()) {
+  if (queryResult.IsValid() &&
+      CurrentCurveId() != queryResult.Curve->GetCurveId()) {
     Follow(queryResult.Curve, queryResult.Distance);
   }
 }
@@ -64,7 +63,8 @@ void CurveFollower::FollowClosestBelow(const Ogre::Vector3 &Position,
                                        const float &Range) {
   auto ignoreId = bIgnoreCurrent ? CurrentCurveId() : Curve::NoneID;
   auto queryResult = Group->FindClosestBelow(Position, ignoreId, Range);
-  if (queryResult.IsValid()) {
+  if (queryResult.IsValid() &&
+      CurrentCurveId() != queryResult.Curve->GetCurveId()) {
     Follow(queryResult.Curve, queryResult.Distance);
   }
 }
@@ -72,3 +72,5 @@ void CurveFollower::FollowClosestBelow(const Ogre::Vector3 &Position,
 Ogre::Quaternion CurveFollower::CalculateOrientation() {
   return Ogre::Vector3::UNIT_X.getRotationTo(m_Forward);
 }
+
+Ogre::Vector3 CurveFollower::GetFollowVelocity() { return m_Forward * m_Speed; }
